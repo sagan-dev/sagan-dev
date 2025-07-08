@@ -20,6 +20,18 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+## Filtering groups by path
+
+Utility helpers live in `src/utils`. `filterGroupsByPath` returns all groups
+from a response object whose `path` starts with `/EAZLE`.
+
+```ts
+import { filterGroupsByPath } from "./src/utils/filterGroups";
+
+const result = filterGroupsByPath(responseObject, "/EAZLE");
+```
+
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
