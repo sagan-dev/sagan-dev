@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 
 export const revalidate = 5;
 
-export default async function Home() {
-  const html = await fetchBuilderHtml("/");
+export default async function Page({ params }: { params: { page: string[] } }) {
+  const urlPath = "/" + params.page.join("/");
+  const html = await fetchBuilderHtml(urlPath);
 
   if (!html) {
     notFound();
