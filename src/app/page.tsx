@@ -39,6 +39,19 @@ export default function Home() {
         />
       </div>
 
+      {/* Professional Page Link */}
+      <div className="mb-8">
+        <a
+          href="/professional"
+          className="group inline-flex items-center gap-2 rounded-lg border border-purple-300 bg-gradient-to-r from-purple-500 to-blue-600 px-6 py-3 text-white transition-all hover:from-purple-600 hover:to-blue-700 hover:shadow-lg"
+        >
+          <span className="text-lg font-semibold">View Professional Portfolio</span>
+          <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+            →
+          </span>
+        </a>
+      </div>
+
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
         <a
           href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
