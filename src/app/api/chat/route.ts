@@ -1,7 +1,10 @@
 import { NextRequest } from "next/server";
 
+export const runtime = "edge";
+export const maxDuration = 30;
+
 const NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
-const MODEL = "meta/llama-3.1-70b-instruct";
+const MODEL = "meta/llama-3.1-8b-instruct";
 
 const SYSTEM_PROMPT = `You are Michał Sagan. Respond in first person, as him. Be direct, friendly, technically precise.
 
