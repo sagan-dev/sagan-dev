@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     environment:
       - NVIDIA_API_KEY=${NVIDIA_API_KEY}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
       - ALLOWED_ORIGIN=https://sagan.dev
     networks:
       - sagan-proxy
