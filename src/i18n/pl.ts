@@ -2,11 +2,14 @@ import type { Translations } from "./en";
 
 export const pl: Translations = {
   hero: {
+    name: "Michał Sagan",
     title: "Inżynier Oprogramowania",
     description:
       "Architekt Produktu specjalizujący się w cloud-native platformach integracyjnych, GraphQL Federation i ekosystemach API. Przekształcam złożone wymagania biznesowe w skalowalne rozwiązania techniczne.",
     contactBtn: "Napisz",
     callBtn: "Zadzwoń",
+    linkedInLabel: "LinkedIn",
+    imageAlt: "Michał Sagan",
   },
   profile: {
     title: "Profil",
@@ -32,6 +35,8 @@ export const pl: Translations = {
   },
   experience: {
     title: "Historia Zatrudnienia",
+    highlightsTitle: "Najważniejsze punkty",
+    technologiesTitle: "Technologie",
     items: [
       {
         role: "Product Architect",
@@ -102,6 +107,7 @@ export const pl: Translations = {
   },
   projects: {
     title: "Kluczowe Projekty",
+    impactTitle: "Wpływ",
     items: [
       {
         title: "Globalna GraphQL Federation dla Commerce",
@@ -273,6 +279,26 @@ export const pl: Translations = {
   },
   recommendations: {
     title: "Rekomendacje",
+    items: [
+      {
+        name: "Mikel Bitson",
+        role: "Senior Software Development Manager",
+        company: "Hunter Douglas",
+        image:
+          "https://media.licdn.com/dms/image/v2/D5603AQGJSz2bvR1KiA/profile-displayphoto-scale_400_400/B56ZgqP_foHkAg-/0/1753055494219?e=1778716800&v=beta&t=NB23wuei_x7hA9JXCwPx8yYzBskf-_Edsb5aUe9rAek",
+        text: "Michal worked with me on an Adobe Commerce headless project and he was a critical resource for the team as we worked to expand the built-in API functionality for our needs. Michal's work is always extremely detailed and done the best possible way. He's continually keeping up with the Adobe Commerce releases and gaining knowledge that ensures his code is current. He worked extremely well with the team, both in code reviews and in meetings. He was able to share a great deal of knowledge during his time with us. If you need a backend developer for any PHP project, especially Adobe Commerce, Michal is a great choice!",
+        date: "August 2023",
+      },
+      {
+        name: "Dex Caffery",
+        role: "Applications Engineer",
+        company: "Hunter Douglas",
+        image:
+          "https://media.licdn.com/dms/image/v2/C4E03AQFofY4rtS7c0A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1516834201631?e=1778716800&v=beta&t=kJ3LZLtBbNZjbvBFYBi2vd1HjP2A05ravXOfHqtCYh8",
+        text: "I worked with Michal while at Levolor on an Adobe Commerce/PWA Studio project. From day 1 Michal was extremely valuable, being able and willing to solve our more complex needs for the project. Michal understands Adobe Commerce very well, and knows how to implement the highest standards of php code. Michal worked very well in our team, teaching and handling code reviews routinely. There are few people I have worked with that approach the same level of quality as Michals work. I learned a lot from Michal, and would choose him to be a team member on any software project I am on.",
+        date: "October 2023",
+      },
+    ],
   },
   contact: {
     title: "Skontaktuj się",
@@ -288,6 +314,7 @@ export const pl: Translations = {
     writeToMe: "Napisz do mnie",
     loadingContact: "Ładowanie danych kontaktowych…",
     formTitle: "Wyślij wiadomość",
+    formReachMeAt: "Albo napisz na",
     formName: "Imię i nazwisko",
     formNamePlaceholder: "Jan Kowalski",
     formEmail: "E-mail",
@@ -304,6 +331,11 @@ export const pl: Translations = {
     scheduleFallbackLink: "Otwórz kalendarz w nowej karcie",
     callNowBtn: "Zadzwoń teraz",
     callNowLabel: "Zadzwoń bezpośrednio",
+    meetShort: "Spotkanie",
+    linkedinUrl: "https://linkedin.com/in/michal-sagan",
+    linkedinHandle: "in/michal-sagan",
+    currentCompany: "Heineken",
+    footerImageAlt: "Michał Sagan",
   },
   cookies: {
     bannerText:

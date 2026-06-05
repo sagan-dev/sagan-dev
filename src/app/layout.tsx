@@ -8,67 +8,60 @@ import { PageViewTracker } from "@/components/PageViewTracker";
 import { ApolloWrapper } from "@/app/ApolloWrapper";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { getSiteContent } from "@/lib/cms";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://sagan.dev"),
-  title: {
-    default: "Michał Sagan — Product Architect",
-    template: "%s | Michał Sagan",
-  },
-  description:
-    "Product Architect specializing in cloud-native integration platforms, GraphQL Federation, and API ecosystems. Based in Poland.",
-  keywords: [
-    "Product Architect",
-    "GraphQL Federation",
-    "Cloud Native",
-    "API Design",
-    "Michał Sagan",
-    "Software Architecture",
-    "Integration Platforms",
-    "API Ecosystems",
-  ],
-  authors: [{ name: "Michał Sagan", url: "https://sagan.dev" }],
-  creator: "Michał Sagan",
-  openGraph: {
-    title: "Michał Sagan — Product Architect",
-    description:
-      "Product Architect specializing in cloud-native integration platforms, GraphQL Federation, and API ecosystems.",
-    url: "https://sagan.dev",
-    siteName: "sagan.dev",
-    type: "website",
-    locale: "en_US",
-    images: [
-      {
-        url: "/hero_banner.png",
-        width: 448,
-        height: 600,
-        alt: "Michał Sagan — Product Architect",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Michał Sagan — Product Architect",
-    description:
-      "Product Architect specializing in cloud-native integration platforms, GraphQL Federation, and API ecosystems.",
-    images: ["/hero_banner.png"],
-  },
-  alternates: {
-    canonical: "https://sagan.dev",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getSiteContent();
+
+  return {
+    metadataBase: new URL(seo.metadataBase),
+    title: {
+      default: seo.titleDefault,
+      template: seo.titleTemplate,
+    },
+    description: seo.description,
+    keywords: seo.keywords,
+    authors: [{ name: seo.authorName, url: seo.authorUrl }],
+    creator: seo.creator,
+    openGraph: {
+      title: seo.titleDefault,
+      description: seo.description,
+      url: seo.canonical,
+      siteName: seo.siteName,
+      type: "website",
+      locale: seo.locale,
+      images: [
+        {
+          url: seo.image,
+          width: seo.imageWidth,
+          height: seo.imageHeight,
+          alt: seo.imageAlt,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.titleDefault,
+      description: seo.description,
+      images: [seo.image],
+    },
+    alternates: {
+      canonical: seo.canonical,
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-};
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -76,11 +69,13 @@ export const viewport: Viewport = {
   themeColor: "#0f172a",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const siteContent = await getSiteContent();
+
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <head>
@@ -118,7 +113,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       </head>
       <body>
         <ApolloWrapper>
-          <LanguageProvider>
+          <LanguageProvider translations={siteContent.translations}>
             <LanguageSwitcher />
             <CookieBanner />
             <PageViewTracker />

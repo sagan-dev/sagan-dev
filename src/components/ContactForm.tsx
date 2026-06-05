@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Dialog,
   DialogContent,
@@ -27,7 +27,7 @@ import { TerminalToast } from "@/components/ui/terminal-toast";
 import { Send } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useContactForm } from "@/contexts/ContactFormContext";
-import { SEND_CONTACT_MESSAGE_MUTATION } from "@/lib/graphql/operations";
+import { CONTACT_INFO_QUERY, SEND_CONTACT_MESSAGE_MUTATION } from "@/lib/graphql/operations";
 
 const formSchema = z.object({
   name: z.string().min(2).max(100),
@@ -46,6 +46,10 @@ interface ContactFormProps {
 
 type SendResult = {
   sendContactMessage: { ok: boolean; message?: string | null };
+};
+
+type ContactInfoData = {
+  contactInfo: { email: string; mailto: string };
 };
 
 export function ContactForm({ open, onOpenChange }: ContactFormProps) {
@@ -87,6 +91,11 @@ export function ContactForm({ open, onOpenChange }: ContactFormProps) {
   const [sendMessage, { loading }] = useMutation<SendResult>(
     SEND_CONTACT_MESSAGE_MUTATION
   );
+  const { data: contactData } = useQuery<ContactInfoData>(CONTACT_INFO_QUERY, {
+    skip: !open,
+  });
+  const contactEmail = contactData?.contactInfo.email ?? "michal@sagan.dev";
+  const contactMailto = contactData?.contactInfo.mailto ?? `mailto:${contactEmail}`;
 
   async function onSubmit(values: FormValues) {
     if (!turnstileToken) return;
@@ -155,12 +164,12 @@ export function ContactForm({ open, onOpenChange }: ContactFormProps) {
           <div className="rounded-xl border border-slate-700 bg-slate-800/40 p-4">
               <h3 className="text-xl text-white">{t.contact.formTitle}</h3>
               <p className="text-sm text-slate-400 mt-2 mb-4">
-                Or reach me at{" "}
+                {t.contact.formReachMeAt}{" "}
                 <a
-                  href="mailto:michal@sagan.dev"
+                  href={contactMailto}
                   className="text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
-                  michal@sagan.dev
+                  {contactEmail}
                 </a>
               </p>
               <button

@@ -69,7 +69,7 @@ export function Experience() {
                       <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div>
                           <h4 className="text-sm text-cyan-400 uppercase tracking-wider mb-2">
-                            Key Highlights
+                            {t.experience.highlightsTitle}
                           </h4>
                           <ul className="space-y-2">
                             {exp.highlights.map((highlight, i) => (
@@ -86,7 +86,7 @@ export function Experience() {
 
                         <div>
                           <h4 className="text-sm text-cyan-400 uppercase tracking-wider mb-2">
-                            Technologies
+                            {t.experience.technologiesTitle}
                           </h4>
                           <div className="flex flex-wrap gap-2">
                             {exp.technologies.map((tech, i) => (

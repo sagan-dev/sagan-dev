@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { CalendarDays } from "lucide-react";
 
 export function LanguageSwitcher() {
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const { openBooking } = useContactForm();
 
   return (
@@ -42,10 +42,10 @@ export function LanguageSwitcher() {
           window.dataLayer?.push({ event: "booking_dialog_opened_from_header" });
         }}
         className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors"
-        title="Meet"
+        title={t.contact.meetShort}
       >
         <CalendarDays className="w-4 h-4" />
-        <span>Meet</span>
+        <span>{t.contact.meetShort}</span>
       </button>
     </motion.div>
   );

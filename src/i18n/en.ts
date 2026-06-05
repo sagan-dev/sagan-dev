@@ -1,10 +1,13 @@
 export const en = {
   hero: {
+    name: "Michał Sagan",
     title: "Software Engineer",
     description:
       "Product Architect specializing in cloud-native integration platforms, GraphQL Federation, and API ecosystems. Transforming complex business requirements into scalable technical solutions.",
     contactBtn: "Write",
     callBtn: "Call",
+    linkedInLabel: "LinkedIn",
+    imageAlt: "Michał Sagan",
   },
   profile: {
     title: "Profile",
@@ -30,6 +33,8 @@ export const en = {
   },
   experience: {
     title: "Employment History",
+    highlightsTitle: "Key Highlights",
+    technologiesTitle: "Technologies",
     items: [
       {
         role: "Product Architect",
@@ -100,6 +105,7 @@ export const en = {
   },
   projects: {
     title: "Key Projects",
+    impactTitle: "Impact",
     items: [
       {
         title: "Global Commerce GraphQL Federation",
@@ -271,6 +277,26 @@ export const en = {
   },
   recommendations: {
     title: "Recommendations",
+    items: [
+      {
+        name: "Mikel Bitson",
+        role: "Senior Software Development Manager",
+        company: "Hunter Douglas",
+        image:
+          "https://media.licdn.com/dms/image/v2/D5603AQGJSz2bvR1KiA/profile-displayphoto-scale_400_400/B56ZgqP_foHkAg-/0/1753055494219?e=1778716800&v=beta&t=NB23wuei_x7hA9JXCwPx8yYzBskf-_Edsb5aUe9rAek",
+        text: "Michal worked with me on an Adobe Commerce headless project and he was a critical resource for the team as we worked to expand the built-in API functionality for our needs. Michal's work is always extremely detailed and done the best possible way. He's continually keeping up with the Adobe Commerce releases and gaining knowledge that ensures his code is current. He worked extremely well with the team, both in code reviews and in meetings. He was able to share a great deal of knowledge during his time with us. If you need a backend developer for any PHP project, especially Adobe Commerce, Michal is a great choice!",
+        date: "August 2023",
+      },
+      {
+        name: "Dex Caffery",
+        role: "Applications Engineer",
+        company: "Hunter Douglas",
+        image:
+          "https://media.licdn.com/dms/image/v2/C4E03AQFofY4rtS7c0A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1516834201631?e=1778716800&v=beta&t=kJ3LZLtBbNZjbvBFYBi2vd1HjP2A05ravXOfHqtCYh8",
+        text: "I worked with Michal while at Levolor on an Adobe Commerce/PWA Studio project. From day 1 Michal was extremely valuable, being able and willing to solve our more complex needs for the project. Michal understands Adobe Commerce very well, and knows how to implement the highest standards of php code. Michal worked very well in our team, teaching and handling code reviews routinely. There are few people I have worked with that approach the same level of quality as Michals work. I learned a lot from Michal, and would choose him to be a team member on any software project I am on.",
+        date: "October 2023",
+      },
+    ],
   },
   contact: {
     title: "Get In Touch",
@@ -286,6 +312,7 @@ export const en = {
     writeToMe: "Write to me",
     loadingContact: "Loading contact details…",
     formTitle: "Send a message",
+    formReachMeAt: "Or reach me at",
     formName: "Name",
     formNamePlaceholder: "John Smith",
     formEmail: "Email",
@@ -302,6 +329,11 @@ export const en = {
     scheduleFallbackLink: "Open calendar booking",
     callNowBtn: "Call now",
     callNowLabel: "Call directly",
+    meetShort: "Meet",
+    linkedinUrl: "https://linkedin.com/in/michal-sagan",
+    linkedinHandle: "in/michal-sagan",
+    currentCompany: "Heineken",
+    footerImageAlt: "Michał Sagan",
   },
   cookies: {
     bannerText:

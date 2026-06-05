@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { en, pl } from "@/i18n";
 import type { Translations } from "@/i18n";
+import type { SiteTranslations } from "@/content/default-site-content";
 
 type Lang = "en" | "pl";
 
@@ -18,7 +19,12 @@ const LanguageContext = createContext<LanguageContextValue>({
   setLang: () => {},
 });
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+interface LanguageProviderProps {
+  children: React.ReactNode;
+  translations?: Partial<SiteTranslations>;
+}
+
+export function LanguageProvider({ children, translations }: LanguageProviderProps) {
   const [lang, setLangState] = useState<Lang>("en");
 
   useEffect(() => {
@@ -33,8 +39,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("lang", next);
   };
 
+  const t = translations?.[lang] ?? (lang === "pl" ? pl : en);
+
   return (
-    <LanguageContext.Provider value={{ lang, t: lang === "pl" ? pl : en, setLang }}>
+    <LanguageContext.Provider value={{ lang, t, setLang }}>
       {children}
     </LanguageContext.Provider>
   );

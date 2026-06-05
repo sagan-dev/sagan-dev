@@ -144,7 +144,7 @@ export function Contact() {
 
                 {/* LinkedIn */}
                 <motion.a
-                  href="https://linkedin.com/in/michal-sagan"
+                  href={t.contact.linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-4 p-4 bg-slate-800/50 border border-slate-700 rounded-lg hover:border-cyan-500/50 transition-all group"
@@ -158,7 +158,7 @@ export function Contact() {
                   </div>
                   <div>
                     <div className="text-sm text-slate-400">{t.contact.linkedinLabel}</div>
-                    <div className="text-white">in/michal-sagan</div>
+                    <div className="text-white">{t.contact.linkedinHandle}</div>
                   </div>
                 </motion.a>
 
@@ -199,7 +199,7 @@ export function Contact() {
                 >
                   <Image
                     src="/footer.png"
-                    alt="Michał Sagan"
+                    alt={t.contact.footerImageAlt}
                     width={384}
                     height={500}
                     className="relative w-80 h-auto md:w-100 object-contain object-bottom drop-shadow-2xl"
@@ -225,7 +225,7 @@ export function Contact() {
                 </Link>
                 <p>
                   {t.contact.roleAt}{" "}
-                  <span className="text-cyan-400">Heineken</span>
+                  <span className="text-cyan-400">{t.contact.currentCompany}</span>
                 </p>
               </div>
             </div>

@@ -62,7 +62,7 @@ export function Projects() {
 
                 <div className="mb-4">
                   <h4 className="text-sm text-cyan-400 uppercase tracking-wider mb-2">
-                    Impact
+                    {t.projects.impactTitle}
                   </h4>
                   <ul className="space-y-1">
                     {project.impact.map((item, i) => (

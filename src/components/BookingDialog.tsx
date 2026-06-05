@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
+import { useQuery } from "@apollo/client/react";
 import { PhoneCall } from "lucide-react";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CONTACT_INFO_QUERY } from "@/lib/graphql/operations";
 
 const Cal = dynamic(() => import("@calcom/embed-react"), { ssr: false });
 
@@ -21,11 +23,17 @@ interface BookingDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type ContactInfoData = {
+  contactInfo: { tel: string };
+};
+
 export function BookingDialog({ open, onOpenChange }: BookingDialogProps) {
   const { t } = useLanguage();
+  const { data } = useQuery<ContactInfoData>(CONTACT_INFO_QUERY, { skip: !open });
 
   // Build phone number client-side to avoid exposing a static tel string in HTML.
-  const phoneHref = useMemo(() => `tel:${["+48", "600", "341", "211"].join("")}`, []);
+  const fallbackPhoneHref = useMemo(() => `tel:${["+48", "600", "341", "211"].join("")}`, []);
+  const phoneHref = data?.contactInfo.tel || fallbackPhoneHref;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -1,6 +1,7 @@
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { sendContactEmail } from "@/lib/resend";
+import { getSiteContent } from "@/lib/cms";
 
 interface ContactInfo {
   email: string;
@@ -29,14 +30,15 @@ interface ResolverContext {
 
 export const resolvers = {
   Query: {
-    contactInfo: (_: unknown, __: unknown, ctx: ResolverContext): ContactInfo => {
+    contactInfo: async (_: unknown, __: unknown, ctx: ResolverContext): Promise<ContactInfo> => {
       const ip = ctx.ip ?? "unknown";
       if (!checkRateLimit(`contactInfo:${ip}`, 10, 60_000)) {
         throw new Error("Too many requests. Please try again later.");
       }
 
-      const email = process.env.CONTACT_EMAIL ?? "";
-      const phone = process.env.CONTACT_PHONE ?? "";
+      const siteContent = await getSiteContent();
+      const email = siteContent.contact.email || process.env.CONTACT_EMAIL || "";
+      const phone = siteContent.contact.phone || process.env.CONTACT_PHONE || "";
 
       return {
         email,

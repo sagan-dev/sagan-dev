@@ -35,7 +35,7 @@ export function Hero({ onOpenForm }: HeroProps) {
           >
             <motion.div className="space-y-2" variants={fadeUp}>
               <h1 className="text-5xl md:text-6xl lg:text-7xl text-white tracking-tight">
-                Michał Sagan
+                {t.hero.name}
               </h1>
               <div className="flex items-center gap-3 justify-center md:justify-start">
                 <div className="h-px bg-gradient-to-r from-cyan-500 to-transparent w-12"></div>
@@ -78,13 +78,13 @@ export function Hero({ onOpenForm }: HeroProps) {
                 <span>{t.hero.callBtn}</span>
               </button>
               <a
-                href="https://linkedin.com/in/michal-sagan"
+                href={t.contact.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700 transition-all"
               >
                 <Linkedin className="w-5 h-5" />
-                <span>LinkedIn</span>
+                <span>{t.hero.linkedInLabel}</span>
               </a>
             </motion.div>
           </motion.div>
@@ -103,7 +103,7 @@ export function Hero({ onOpenForm }: HeroProps) {
               >
                 <Image
                   src="/hero_banner.png"
-                  alt="Michał Sagan"
+                  alt={t.hero.imageAlt}
                   width={448}
                   height={600}
                   priority
