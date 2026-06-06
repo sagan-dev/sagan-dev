@@ -22,7 +22,8 @@ const ContentSecurityPolicy = `
     https://analytics.google.com
     https://cal.sagan.dev
     https://*.contentsquare.net
-    https://challenges.cloudflare.com;
+    https://challenges.cloudflare.com
+    https://api.sagan.eu;
   frame-src https://challenges.cloudflare.com https://cal.sagan.dev;
   worker-src 'self' blob:;
   font-src 'self' data:;
