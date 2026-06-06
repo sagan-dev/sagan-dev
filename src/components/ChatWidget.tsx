@@ -196,8 +196,8 @@ export function ChatWidget() {
                 onSuccess={(token) => setTurnstileToken(token)}
                 onExpire={() => setTurnstileToken(null)}
                 onError={() => setTurnstileToken(null)}
-                options={{ theme: "dark", size: "invisible" }}
-                className="hidden"
+                options={{ theme: "dark", size: "compact" }}
+                style={{ display: "none" }}
               />
             )}
           </div>
