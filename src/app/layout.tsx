@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { CookieBanner } from "@/components/CookieBanner";
+import { DevToolLauncher } from "@/components/Toolbox";
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { ApolloWrapper } from "@/app/ApolloWrapper";
 import { Geist } from "next/font/google";
@@ -116,6 +117,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <LanguageProvider translations={siteContent.translations}>
             <LanguageSwitcher />
             <CookieBanner />
+            <DevToolLauncher />
             <PageViewTracker />
             {children}
           </LanguageProvider>

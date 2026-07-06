@@ -246,6 +246,10 @@ export const pl: Translations = {
     missing: "brak",
     emptyList: "Nie znaleziono wartości w tym tokenie.",
     invalidToken: "To nie wygląda jak czytelny payload JWT.",
+    openMenu: "Otwórz developer toolbox",
+    close: "Zamknij",
+    openFullScreen: "Otwórz pełny ekran",
+    backToSite: "Wróć do sagan.dev",
     jwt: {
       title: "Dekoder JWT",
       subtitle: "Dekoduje header i payload bez wysyłania tokenu gdziekolwiek.",

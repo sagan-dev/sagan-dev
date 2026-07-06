@@ -4,7 +4,6 @@ import { Hero } from "@/components/Hero";
 import { Profile } from "@/components/Profile";
 import { Experience } from "@/components/Experience";
 import { Projects } from "@/components/Projects";
-import { Toolbox } from "@/components/Toolbox";
 import { Skills } from "@/components/Skills";
 import { Awards } from "@/components/Awards";
 import { Recommendations } from "@/components/Recommendations";
@@ -38,7 +37,6 @@ export function HomePage({ schemaJson }: HomePageProps) {
           <Profile />
           <Experience />
           <Projects />
-          <Toolbox />
           <Skills />
           <Awards />
           <Recommendations />

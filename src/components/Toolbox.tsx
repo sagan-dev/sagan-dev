@@ -1,9 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Braces, Clock3, KeyRound, ShieldCheck } from "lucide-react";
+import { Braces, Clock3, KeyRound, Maximize2, ShieldCheck, Wrench, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { DEV_TOOLS, type DevToolSlug } from "@/lib/dev-tools";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -11,6 +15,11 @@ interface DecodedJwt {
   header: JsonRecord;
   payload: JsonRecord;
 }
+
+const toolIcons: Record<DevToolSlug, LucideIcon> = {
+  "jwt-decoder": KeyRound,
+  "linux-time": Clock3,
+};
 
 function decodeBase64UrlJson(part: string): JsonRecord {
   const normalized = part.replace(/-/g, "+").replace(/_/g, "/");
@@ -163,6 +172,17 @@ function stringifyClaim(value: unknown) {
   return JSON.stringify(value, null, 2) ?? "";
 }
 
+function useLiveNow() {
+  const [now, setNow] = useState(() => Date.now() / 1000);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now() / 1000), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  return now;
+}
+
 function TimeDelta({
   timestamp,
   now,
@@ -211,18 +231,42 @@ function PillList({ items, emptyLabel }: { items: string[]; emptyLabel: string }
   );
 }
 
-export function Toolbox() {
+function ToolHeader({
+  icon: Icon,
+  tone,
+  title,
+  subtitle,
+}: {
+  icon: LucideIcon;
+  tone: "cyan" | "blue";
+  title: string;
+  subtitle: string;
+}) {
+  const color = tone === "cyan" ? "bg-cyan-500/15 text-cyan-300" : "bg-blue-500/15 text-blue-300";
+
+  return (
+    <div className="mb-5 flex items-center gap-3">
+      <div className={`rounded-lg p-3 ${color}`}>
+        <Icon className="h-6 w-6" />
+      </div>
+      <div>
+        <h3 className="text-2xl text-white">{title}</h3>
+        <p className="text-sm text-slate-400">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
+function toolCardClass(framed: boolean) {
+  return framed ? "rounded-xl border border-slate-700 bg-slate-800/50 p-6" : "";
+}
+
+export function JwtDecoderTool({ framed = true }: { framed?: boolean }) {
   const { lang, t } = useLanguage();
   const locale = lang === "pl" ? "pl-PL" : "en-US";
   const copy = t.toolbox;
+  const now = useLiveNow();
   const [token, setToken] = useState("");
-  const [unixInput, setUnixInput] = useState("");
-  const [now, setNow] = useState(() => Date.now() / 1000);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => setNow(Date.now() / 1000), 1000);
-    return () => window.clearInterval(interval);
-  }, []);
 
   const decoded = useMemo(() => {
     if (!token.trim()) {
@@ -243,13 +287,176 @@ export function Toolbox() {
   const roles = payload ? collectClaimValues(payload, ["roles", "role", "realm_access"]) : [];
   const groups = payload ? collectClaimValues(payload, ["groups", "group"]) : [];
   const scopes = payload ? collectClaimValues(payload, ["scope", "scp", "permissions"]) : [];
-  const unixTimestamp = normalizeUnixTime(unixInput);
   const claimEntries = payload
     ? Object.entries(payload).filter(([key]) => !["roles", "role", "groups", "group", "scope", "scp"].includes(key))
     : [];
 
   return (
-    <section id="toolbox" className="py-24 px-6 md:px-12 lg:px-24 bg-slate-950/40">
+    <div className={toolCardClass(framed)}>
+      <ToolHeader icon={KeyRound} tone="cyan" title={copy.jwt.title} subtitle={copy.jwt.subtitle} />
+
+      <label className="mb-2 block text-sm text-slate-300" htmlFor="jwt-token">
+        {copy.jwt.inputLabel}
+      </label>
+      <textarea
+        id="jwt-token"
+        value={token}
+        onChange={(event) => setToken(event.target.value)}
+        placeholder={copy.jwt.placeholder}
+        spellCheck={false}
+        className="min-h-36 w-full resize-y rounded-lg border border-slate-600 bg-slate-950/70 px-4 py-3 font-mono text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-400"
+      />
+
+      {decoded.error ? <p className="mt-3 text-sm text-amber-300">{decoded.error}</p> : null}
+
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+          <p className="mb-2 text-sm text-slate-400">{copy.jwt.expiresIn}</p>
+          <p className="text-lg text-white">
+            <TimeDelta
+              timestamp={expiresAt}
+              now={now}
+              locale={locale}
+              futureLabel={copy.in}
+              pastLabel={copy.ago}
+              emptyLabel={copy.missing}
+            />
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+          <p className="mb-2 text-sm text-slate-400">{copy.jwt.tokenAge}</p>
+          <p className="text-lg text-white">
+            {issuedAt === null ? (
+              <span className="text-slate-500">{copy.missing}</span>
+            ) : (
+              <span className="text-cyan-200">{formatDuration(now - issuedAt, locale)}</span>
+            )}
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+          <p className="mb-2 text-sm text-slate-400">{copy.jwt.notBefore}</p>
+          <p className="text-lg text-white">
+            <TimeDelta
+              timestamp={notBefore}
+              now={now}
+              locale={locale}
+              futureLabel={copy.in}
+              pastLabel={copy.ago}
+              emptyLabel={copy.missing}
+            />
+          </p>
+        </div>
+      </div>
+
+      {payload ? (
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <div>
+            <h4 className="mb-3 flex items-center gap-2 text-cyan-300">
+              <ShieldCheck className="h-4 w-4" />
+              {copy.jwt.roles}
+            </h4>
+            <PillList items={roles} emptyLabel={copy.emptyList} />
+          </div>
+          <div>
+            <h4 className="mb-3 text-cyan-300">{copy.jwt.groups}</h4>
+            <PillList items={groups} emptyLabel={copy.emptyList} />
+          </div>
+          <div>
+            <h4 className="mb-3 text-cyan-300">{copy.jwt.scopes}</h4>
+            <PillList items={scopes} emptyLabel={copy.emptyList} />
+          </div>
+        </div>
+      ) : null}
+
+      {payload ? (
+        <div className="mt-6">
+          <h4 className="mb-3 flex items-center gap-2 text-cyan-300">
+            <Braces className="h-4 w-4" />
+            {copy.jwt.claims}
+          </h4>
+          <div className="grid gap-3 md:grid-cols-2">
+            {claimEntries.map(([key, value]) => (
+              <div key={key} className="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
+                <p className="text-xs uppercase tracking-wider text-slate-500">{prettyClaimName(key)}</p>
+                <pre className="mt-1 overflow-auto whitespace-pre-wrap break-words text-sm text-slate-200">
+                  {["exp", "iat", "nbf"].includes(key) && claimNumber(payload, key) !== null
+                    ? `${formatDateTime(claimNumber(payload, key) ?? 0, locale)}\n${stringifyClaim(value)}`
+                    : stringifyClaim(value)}
+                </pre>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function LinuxTimeTool({ framed = true }: { framed?: boolean }) {
+  const { lang, t } = useLanguage();
+  const locale = lang === "pl" ? "pl-PL" : "en-US";
+  const copy = t.toolbox;
+  const now = useLiveNow();
+  const [unixInput, setUnixInput] = useState("");
+  const unixTimestamp = normalizeUnixTime(unixInput);
+
+  return (
+    <div className={toolCardClass(framed)}>
+      <ToolHeader icon={Clock3} tone="blue" title={copy.unix.title} subtitle={copy.unix.subtitle} />
+
+      <label className="mb-2 block text-sm text-slate-300" htmlFor="unix-time">
+        {copy.unix.inputLabel}
+      </label>
+      <input
+        id="unix-time"
+        value={unixInput}
+        onChange={(event) => setUnixInput(event.target.value)}
+        placeholder={copy.unix.placeholder}
+        inputMode="decimal"
+        className="w-full rounded-lg border border-slate-600 bg-slate-950/70 px-4 py-3 font-mono text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-400"
+      />
+
+      <div className="mt-6 space-y-4">
+        <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+          <p className="mb-2 text-sm text-slate-400">{copy.unix.delta}</p>
+          <p className="text-lg text-white">
+            <TimeDelta
+              timestamp={unixTimestamp}
+              now={now}
+              locale={locale}
+              futureLabel={copy.in}
+              pastLabel={copy.ago}
+              emptyLabel={copy.missing}
+            />
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+          <p className="mb-2 text-sm text-slate-400">{copy.unix.date}</p>
+          <p className="text-base leading-relaxed text-slate-100">
+            {unixTimestamp === null ? copy.missing : formatDateTime(unixTimestamp, locale)}
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+          <p className="mb-2 text-sm text-slate-400">{copy.unix.normalized}</p>
+          <p className="font-mono text-sm text-cyan-200">
+            {unixTimestamp === null ? copy.missing : Math.round(unixTimestamp)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DevToolContent({ tool, framed = true }: { tool: DevToolSlug; framed?: boolean }) {
+  return tool === "jwt-decoder" ? <JwtDecoderTool framed={framed} /> : <LinuxTimeTool framed={framed} />;
+}
+
+export function Toolbox() {
+  const { t } = useLanguage();
+  const copy = t.toolbox;
+
+  return (
+    <section id="toolbox" className="bg-slate-950/40 px-6 py-24 md:px-12 lg:px-24">
       <div className="container mx-auto">
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -268,179 +475,172 @@ export function Toolbox() {
 
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(340px,0.7fr)]">
             <motion.div
-              className="rounded-xl border border-slate-700 bg-slate-800/50 p-6"
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <div className="mb-5 flex items-center gap-3">
-                <div className="rounded-lg bg-cyan-500/15 p-3">
-                  <KeyRound className="h-6 w-6 text-cyan-300" />
-                </div>
-                <div>
-                  <h3 className="text-2xl text-white">{copy.jwt.title}</h3>
-                  <p className="text-sm text-slate-400">{copy.jwt.subtitle}</p>
-                </div>
-              </div>
-
-              <label className="mb-2 block text-sm text-slate-300" htmlFor="jwt-token">
-                {copy.jwt.inputLabel}
-              </label>
-              <textarea
-                id="jwt-token"
-                value={token}
-                onChange={(event) => setToken(event.target.value)}
-                placeholder={copy.jwt.placeholder}
-                spellCheck={false}
-                className="min-h-36 w-full resize-y rounded-lg border border-slate-600 bg-slate-950/70 px-4 py-3 font-mono text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-400"
-              />
-
-              {decoded.error ? (
-                <p className="mt-3 text-sm text-amber-300">{decoded.error}</p>
-              ) : null}
-
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
-                  <p className="mb-2 text-sm text-slate-400">{copy.jwt.expiresIn}</p>
-                  <p className="text-lg text-white">
-                    <TimeDelta
-                      timestamp={expiresAt}
-                      now={now}
-                      locale={locale}
-                      futureLabel={copy.in}
-                      pastLabel={copy.ago}
-                      emptyLabel={copy.missing}
-                    />
-                  </p>
-                </div>
-                <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
-                  <p className="mb-2 text-sm text-slate-400">{copy.jwt.tokenAge}</p>
-                  <p className="text-lg text-white">
-                    {issuedAt === null ? (
-                      <span className="text-slate-500">{copy.missing}</span>
-                    ) : (
-                      <span className="text-cyan-200">{formatDuration(now - issuedAt, locale)}</span>
-                    )}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
-                  <p className="mb-2 text-sm text-slate-400">{copy.jwt.notBefore}</p>
-                  <p className="text-lg text-white">
-                    <TimeDelta
-                      timestamp={notBefore}
-                      now={now}
-                      locale={locale}
-                      futureLabel={copy.in}
-                      pastLabel={copy.ago}
-                      emptyLabel={copy.missing}
-                    />
-                  </p>
-                </div>
-              </div>
-
-              {payload ? (
-                <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                  <div>
-                    <h4 className="mb-3 flex items-center gap-2 text-cyan-300">
-                      <ShieldCheck className="h-4 w-4" />
-                      {copy.jwt.roles}
-                    </h4>
-                    <PillList items={roles} emptyLabel={copy.emptyList} />
-                  </div>
-                  <div>
-                    <h4 className="mb-3 text-cyan-300">{copy.jwt.groups}</h4>
-                    <PillList items={groups} emptyLabel={copy.emptyList} />
-                  </div>
-                  <div>
-                    <h4 className="mb-3 text-cyan-300">{copy.jwt.scopes}</h4>
-                    <PillList items={scopes} emptyLabel={copy.emptyList} />
-                  </div>
-                </div>
-              ) : null}
-
-              {payload ? (
-                <div className="mt-6">
-                  <h4 className="mb-3 flex items-center gap-2 text-cyan-300">
-                    <Braces className="h-4 w-4" />
-                    {copy.jwt.claims}
-                  </h4>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {claimEntries.map(([key, value]) => (
-                      <div key={key} className="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
-                        <p className="text-xs uppercase tracking-wider text-slate-500">{prettyClaimName(key)}</p>
-                        <pre className="mt-1 overflow-auto whitespace-pre-wrap break-words text-sm text-slate-200">
-                          {["exp", "iat", "nbf"].includes(key) && claimNumber(payload, key) !== null
-                            ? `${formatDateTime(claimNumber(payload, key) ?? 0, locale)}\n${stringifyClaim(value)}`
-                            : stringifyClaim(value)}
-                        </pre>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
+              <JwtDecoderTool />
             </motion.div>
-
             <motion.div
-              className="rounded-xl border border-slate-700 bg-slate-800/50 p-6"
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.08 }}
             >
-              <div className="mb-5 flex items-center gap-3">
-                <div className="rounded-lg bg-blue-500/15 p-3">
-                  <Clock3 className="h-6 w-6 text-blue-300" />
-                </div>
-                <div>
-                  <h3 className="text-2xl text-white">{copy.unix.title}</h3>
-                  <p className="text-sm text-slate-400">{copy.unix.subtitle}</p>
-                </div>
-              </div>
-
-              <label className="mb-2 block text-sm text-slate-300" htmlFor="unix-time">
-                {copy.unix.inputLabel}
-              </label>
-              <input
-                id="unix-time"
-                value={unixInput}
-                onChange={(event) => setUnixInput(event.target.value)}
-                placeholder={copy.unix.placeholder}
-                inputMode="decimal"
-                className="w-full rounded-lg border border-slate-600 bg-slate-950/70 px-4 py-3 font-mono text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-400"
-              />
-
-              <div className="mt-6 space-y-4">
-                <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
-                  <p className="mb-2 text-sm text-slate-400">{copy.unix.delta}</p>
-                  <p className="text-lg text-white">
-                    <TimeDelta
-                      timestamp={unixTimestamp}
-                      now={now}
-                      locale={locale}
-                      futureLabel={copy.in}
-                      pastLabel={copy.ago}
-                      emptyLabel={copy.missing}
-                    />
-                  </p>
-                </div>
-                <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
-                  <p className="mb-2 text-sm text-slate-400">{copy.unix.date}</p>
-                  <p className="text-base leading-relaxed text-slate-100">
-                    {unixTimestamp === null ? copy.missing : formatDateTime(unixTimestamp, locale)}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
-                  <p className="mb-2 text-sm text-slate-400">{copy.unix.normalized}</p>
-                  <p className="font-mono text-sm text-cyan-200">
-                    {unixTimestamp === null ? copy.missing : Math.round(unixTimestamp)}
-                  </p>
-                </div>
-              </div>
+              <LinuxTimeTool />
             </motion.div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+export function DevToolLauncher() {
+  const { t } = useLanguage();
+  const router = useRouter();
+  const copy = t.toolbox;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeTool, setActiveTool] = useState<DevToolSlug | null>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = activeTool ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [activeTool]);
+
+  return (
+    <>
+      <div className="fixed bottom-5 left-5 z-[60]">
+        {isMenuOpen ? (
+          <div className="mb-3 w-[min(360px,calc(100vw-40px))] rounded-xl border border-slate-700 bg-slate-900/95 p-3 shadow-2xl shadow-cyan-950/40 backdrop-blur">
+            <div className="mb-2 flex items-center justify-between px-1">
+              <p className="text-sm uppercase tracking-[0.18em] text-cyan-300">{copy.kicker}</p>
+              <button
+                type="button"
+                aria-label={copy.close}
+                onClick={() => setIsMenuOpen(false)}
+                className="rounded-md p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {DEV_TOOLS.map((tool) => {
+                const Icon = toolIcons[tool.slug];
+                const label = tool.key === "jwt" ? copy.jwt.title : copy.unix.title;
+                const subtitle = tool.key === "jwt" ? copy.jwt.subtitle : copy.unix.subtitle;
+
+                return (
+                  <button
+                    key={tool.slug}
+                    type="button"
+                    data-testid={`dev-tool-overlay-${tool.slug}`}
+                    onClick={() => {
+                      setActiveTool(tool.slug);
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex w-full items-start gap-3 rounded-lg border border-slate-700 bg-slate-800/70 p-3 text-left transition-colors hover:border-cyan-500/50 hover:bg-slate-800"
+                  >
+                    <span className="rounded-md bg-cyan-500/15 p-2 text-cyan-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-base text-white">{label}</span>
+                      <span className="mt-1 block text-sm leading-relaxed text-slate-400">{subtitle}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        <button
+          type="button"
+          data-testid="dev-tool-launcher"
+          aria-label={copy.openMenu}
+          title={copy.openMenu}
+          onClick={() => setIsMenuOpen((value) => !value)}
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-cyan-400/40 bg-slate-900/95 text-cyan-300 shadow-lg shadow-cyan-950/40 backdrop-blur transition-all hover:border-cyan-300 hover:bg-slate-800 hover:text-white"
+        >
+          <Wrench className="h-5 w-5" />
+        </button>
+      </div>
+
+      {activeTool ? (
+        <div className="fixed inset-0 z-[90] bg-slate-950/90 px-4 py-4 backdrop-blur-md sm:px-6">
+          <div className="mx-auto flex h-full max-w-6xl flex-col overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">{copy.kicker}</p>
+                <h2 className="text-xl text-white">
+                  {activeTool === "jwt-decoder" ? copy.jwt.title : copy.unix.title}
+                </h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-label={copy.openFullScreen}
+                  title={copy.openFullScreen}
+                  onClick={() => {
+                    const nextTool = activeTool;
+                    setActiveTool(null);
+                    router.push(`/dev-tool/${nextTool}`);
+                  }}
+                  className="rounded-md border border-slate-700 p-2 text-cyan-200 transition-colors hover:border-cyan-500/50 hover:bg-slate-800 hover:text-white"
+                >
+                  <Maximize2 className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label={copy.close}
+                  onClick={() => setActiveTool(null)}
+                  className="rounded-md p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <DevToolContent tool={activeTool} framed={false} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+export function DevToolFullscreen({ tool }: { tool: DevToolSlug }) {
+  const { t } = useLanguage();
+  const copy = t.toolbox;
+  const title = tool === "jwt-decoder" ? copy.jwt.title : copy.unix.title;
+  const subtitle = tool === "jwt-decoder" ? copy.jwt.subtitle : copy.unix.subtitle;
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-20 md:px-12 lg:px-24">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-3 text-sm uppercase tracking-[0.24em] text-cyan-300">{copy.kicker}</p>
+            <h1 className="text-4xl text-white md:text-5xl">{title}</h1>
+            <p className="mt-3 max-w-2xl text-slate-300">{subtitle}</p>
+          </div>
+          <Link
+            href="/"
+            className="rounded-md border border-slate-700 px-4 py-2 text-sm text-cyan-200 transition-colors hover:border-cyan-500/50 hover:bg-slate-800"
+          >
+            {copy.backToSite}
+          </Link>
+        </div>
+
+        <div className="rounded-xl border border-slate-700 bg-slate-800/50 p-6">
+          <DevToolContent tool={tool} framed={false} />
+        </div>
+      </div>
+    </main>
   );
 }

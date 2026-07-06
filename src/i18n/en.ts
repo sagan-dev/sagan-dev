@@ -244,6 +244,10 @@ export const en = {
     missing: "missing",
     emptyList: "No values found in this token.",
     invalidToken: "This does not look like a readable JWT payload.",
+    openMenu: "Open developer toolbox",
+    close: "Close",
+    openFullScreen: "Open full screen",
+    backToSite: "Back to sagan.dev",
     jwt: {
       title: "JWT decoder",
       subtitle: "Decode header and payload without sending the token anywhere.",
