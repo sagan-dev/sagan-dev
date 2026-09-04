@@ -51,6 +51,20 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: seo.canonical,
     },
+    manifest: "/manifest.webmanifest",
+    icons: {
+      icon: [
+        { url: "/icons/sagan.svg", type: "image/svg+xml" },
+        { url: "/icons/generated/sagan-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icons/generated/sagan-192.png", sizes: "192x192", type: "image/png" },
+      ],
+      apple: [{ url: "/icons/generated/sagan-180.png", sizes: "180x180", type: "image/png" }],
+    },
+    appleWebApp: {
+      capable: true,
+      title: "sagan.dev",
+      statusBarStyle: "black-translucent",
+    },
     robots: {
       index: true,
       follow: true,
