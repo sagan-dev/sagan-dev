@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DevToolFullscreen } from "@/components/Toolbox";
-import { DEV_TOOLS, getDevTool, getDevToolIconPath, type DevToolSlug } from "@/lib/dev-tools";
+import {
+  DEV_TOOLS,
+  getDevTool,
+  getDevToolFaviconPath,
+  getDevToolIconPath,
+  type DevToolSlug,
+} from "@/lib/dev-tools";
 
 interface DevToolPageProps {
   params: Promise<{
@@ -29,10 +35,12 @@ export async function generateMetadata({ params }: DevToolPageProps): Promise<Me
     manifest: `/dev-tool/${tool.slug}/manifest.webmanifest`,
     icons: {
       icon: [
+        { url: getDevToolFaviconPath(tool.iconBase), sizes: "any", type: "image/x-icon" },
         { url: `/icons/${tool.iconBase}.svg`, type: "image/svg+xml" },
         { url: getDevToolIconPath(tool.iconBase, 32), sizes: "32x32", type: "image/png" },
         { url: getDevToolIconPath(tool.iconBase, 192), sizes: "192x192", type: "image/png" },
       ],
+      shortcut: [getDevToolFaviconPath(tool.iconBase)],
       apple: [{ url: getDevToolIconPath(tool.iconBase, 180), sizes: "180x180", type: "image/png" }],
     },
     appleWebApp: {

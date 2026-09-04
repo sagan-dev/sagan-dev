@@ -54,10 +54,13 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: "/manifest.webmanifest",
     icons: {
       icon: [
+        { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+        { url: "/icons/generated/sagan.ico", sizes: "any", type: "image/x-icon" },
         { url: "/icons/sagan.svg", type: "image/svg+xml" },
         { url: "/icons/generated/sagan-32.png", sizes: "32x32", type: "image/png" },
         { url: "/icons/generated/sagan-192.png", sizes: "192x192", type: "image/png" },
       ],
+      shortcut: ["/favicon.ico"],
       apple: [{ url: "/icons/generated/sagan-180.png", sizes: "180x180", type: "image/png" }],
     },
     appleWebApp: {

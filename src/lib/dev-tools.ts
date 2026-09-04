@@ -40,3 +40,7 @@ export function getDevTool(slug: string) {
 export function getDevToolIconPath(iconBase: string, size: 32 | 180 | 192 | 512) {
   return `/icons/generated/${iconBase}-${size}.png`;
 }
+
+export function getDevToolFaviconPath(iconBase: string) {
+  return `/icons/generated/${iconBase}.ico`;
+}
