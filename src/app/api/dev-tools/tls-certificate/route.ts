@@ -35,6 +35,12 @@ interface CertificateInfo {
   ca?: boolean;
 }
 
+interface ParsedTarget {
+  hostname: string;
+  port: number;
+  url: string;
+}
+
 interface PeerCertificate {
   subject?: CertificateName;
   issuer?: CertificateName;
@@ -57,7 +63,7 @@ function jsonError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-function parseTarget(target: string) {
+function parseTarget(target: string): ParsedTarget {
   const withProtocol = /^[a-z][a-z\d+.-]*:\/\//i.test(target) ? target : `https://${target}`;
   const url = new URL(withProtocol);
 
@@ -72,7 +78,7 @@ function parseTarget(target: string) {
     throw new Error("Enter a valid HTTPS host and port");
   }
 
-  return { hostname, port };
+  return { hostname, port, url: url.toString() };
 }
 
 function isPrivateIp(address: string) {
@@ -170,6 +176,66 @@ async function assertPublicHost(hostname: string) {
   }
 }
 
+async function findBrowserDestination(startUrl: string) {
+  let current = new URL(startUrl);
+  const redirects: Array<{ from: string; to: string; status: number }> = [];
+
+  for (let index = 0; index < 5; index += 1) {
+    await assertPublicHost(current.hostname);
+
+    let response = await fetch(current, {
+      method: "HEAD",
+      redirect: "manual",
+      headers: {
+        "User-Agent": "sagan.dev TLS Certificate Inspector",
+      },
+    });
+
+    if (response.status === 405 || response.status === 403) {
+      response = await fetch(current, {
+        method: "GET",
+        redirect: "manual",
+        headers: {
+          "User-Agent": "sagan.dev TLS Certificate Inspector",
+        },
+      });
+    }
+
+    if (![301, 302, 303, 307, 308].includes(response.status)) {
+      return {
+        url: current.toString(),
+        hostname: current.hostname.toLowerCase(),
+        port: current.port ? Number(current.port) : 443,
+        redirects,
+      };
+    }
+
+    const location = response.headers.get("location");
+    if (!location) {
+      break;
+    }
+
+    const next = new URL(location, current);
+    if (next.protocol !== "https:") {
+      break;
+    }
+
+    redirects.push({
+      from: current.toString(),
+      to: next.toString(),
+      status: response.status,
+    });
+    current = next;
+  }
+
+  return {
+    url: current.toString(),
+    hostname: current.hostname.toLowerCase(),
+    port: current.port ? Number(current.port) : 443,
+    redirects,
+  };
+}
+
 function readTlsCertificate(hostname: string, port: number) {
   return new Promise<{
     authorized: boolean;
@@ -243,10 +309,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const details = await readTlsCertificate(target.hostname, target.port);
+    const browserDestination = await findBrowserDestination(target.url);
+    const destinationDiffers =
+      browserDestination.hostname !== target.hostname || browserDestination.port !== target.port;
+    const browserDestinationDetails = destinationDiffers
+      ? await readTlsCertificate(browserDestination.hostname, browserDestination.port)
+      : null;
 
     return NextResponse.json({
       target,
       checkedAt: new Date().toISOString(),
+      browserDestination,
+      browserDestinationDetails,
       ...details,
     });
   } catch (error) {

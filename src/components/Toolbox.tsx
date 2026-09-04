@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { Braces, Clock3, KeyRound, Maximize2, ShieldCheck, Wrench, X } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Braces, Maximize2, ShieldCheck, Wrench, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { DEV_TOOLS, type DevToolSlug } from "@/lib/dev-tools";
+import { DEV_TOOLS, getDevToolIconPath, type DevToolSlug } from "@/lib/dev-tools";
 
 type JsonRecord = Record<string, unknown>;
 type ToolboxCopy = ReturnType<typeof useLanguage>["t"]["toolbox"];
@@ -59,12 +59,34 @@ interface TlsCertificateResponse {
   };
   certificate: TlsCertificateInfo;
   chain: TlsCertificateInfo[];
+  browserDestination?: {
+    url: string;
+    hostname: string;
+    port: number;
+    redirects: Array<{
+      from: string;
+      to: string;
+      status: number;
+    }>;
+  };
+  browserDestinationDetails?: {
+    authorized: boolean;
+    authorizationError: string | null;
+    protocol: string | null;
+    cipher: {
+      name?: string;
+      standardName?: string;
+      version?: string;
+    };
+    certificate: TlsCertificateInfo;
+    chain: TlsCertificateInfo[];
+  } | null;
 }
 
-const toolIcons: Record<DevToolSlug, LucideIcon> = {
-  "jwt-decoder": KeyRound,
-  "linux-time": Clock3,
-  "tls-certificate": ShieldCheck,
+const toolIconBaseBySlug: Record<DevToolSlug, string> = {
+  "jwt-decoder": "tool-jwt-decoder",
+  "linux-time": "tool-linux-time",
+  "tls-certificate": "tool-tls-certificate",
 };
 
 function decodeBase64UrlJson(part: string): JsonRecord {
@@ -252,6 +274,41 @@ function InfoBlock({ label, value }: { label: string; value: React.ReactNode }) 
   );
 }
 
+function TlsCertificateSummary({
+  certificate,
+  authorized,
+  authorizationError,
+  label,
+  copy,
+}: {
+  certificate: TlsCertificateInfo;
+  authorized: boolean;
+  authorizationError: string | null;
+  label: string;
+  copy: ToolboxCopy;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+      <div className="mb-3 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+        <p className="text-sm uppercase tracking-[0.18em] text-cyan-300">{label}</p>
+        <p className={authorized ? "text-sm text-emerald-300" : "text-sm text-amber-300"}>
+          {authorized ? copy.tls.valid : `${copy.tls.invalid}: ${authorizationError ?? ""}`}
+        </p>
+      </div>
+      <dl className="space-y-3">
+        <div>
+          <dt className="text-sm text-slate-400">{copy.tls.subject}</dt>
+          <dd className="break-words text-white">{formatCertificateName(certificate.subject) || copy.missing}</dd>
+        </div>
+        <div>
+          <dt className="text-sm text-slate-400">{copy.tls.issuer}</dt>
+          <dd className="break-words text-white">{formatCertificateName(certificate.issuer) || copy.missing}</dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
 function useLiveNow() {
   const [now, setNow] = useState(() => Date.now() / 1000);
 
@@ -311,13 +368,40 @@ function PillList({ items, emptyLabel }: { items: string[]; emptyLabel: string }
   );
 }
 
+function CustomToolIcon({
+  iconBase,
+  title,
+  size = 48,
+}: {
+  iconBase: string;
+  title: string;
+  size?: number;
+}) {
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-slate-950/30 shadow-lg shadow-slate-950/30"
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src={getDevToolIconPath(iconBase, 192)}
+        alt=""
+        aria-hidden="true"
+        title={title}
+        width={size}
+        height={size}
+        className="h-full w-full object-cover"
+      />
+    </span>
+  );
+}
+
 function ToolHeader({
-  icon: Icon,
+  iconBase,
   tone,
   title,
   subtitle,
 }: {
-  icon: LucideIcon;
+  iconBase: string;
   tone: "cyan" | "blue" | "emerald";
   title: string;
   subtitle: string;
@@ -331,8 +415,8 @@ function ToolHeader({
 
   return (
     <div className="mb-5 flex items-center gap-3">
-      <div className={`rounded-lg p-3 ${color}`}>
-        <Icon className="h-6 w-6" />
+      <div className={`rounded-xl p-1 ${color}`}>
+        <CustomToolIcon iconBase={iconBase} title={title} size={52} />
       </div>
       <div>
         <h3 className="text-2xl text-white">{title}</h3>
@@ -378,7 +462,12 @@ export function JwtDecoderTool({ framed = true }: { framed?: boolean }) {
 
   return (
     <div className={toolCardClass(framed)}>
-      <ToolHeader icon={KeyRound} tone="cyan" title={copy.jwt.title} subtitle={copy.jwt.subtitle} />
+      <ToolHeader
+        iconBase={toolIconBaseBySlug["jwt-decoder"]}
+        tone="cyan"
+        title={copy.jwt.title}
+        subtitle={copy.jwt.subtitle}
+      />
 
       <label className="mb-2 block text-sm text-slate-300" htmlFor="jwt-token">
         {copy.jwt.inputLabel}
@@ -487,7 +576,12 @@ export function LinuxTimeTool({ framed = true }: { framed?: boolean }) {
 
   return (
     <div className={toolCardClass(framed)}>
-      <ToolHeader icon={Clock3} tone="blue" title={copy.unix.title} subtitle={copy.unix.subtitle} />
+      <ToolHeader
+        iconBase={toolIconBaseBySlug["linux-time"]}
+        tone="blue"
+        title={copy.unix.title}
+        subtitle={copy.unix.subtitle}
+      />
 
       <label className="mb-2 block text-sm text-slate-300" htmlFor="unix-time">
         {copy.unix.inputLabel}
@@ -576,6 +670,7 @@ export function TlsCertificateTool({ framed = true }: { framed?: boolean }) {
   const validTo = formatDate(certificate?.validTo, locale);
   const checkedAt = details ? formatDate(details.checkedAt, locale) : "";
   const altNames = certificate?.subjectAltName ?? [];
+  const destinationCertificate = details?.browserDestinationDetails?.certificate;
   const fingerprints = [
     certificate?.fingerprint256 ? ["SHA-256", certificate.fingerprint256] : null,
     certificate?.fingerprint ? ["SHA-1", certificate.fingerprint] : null,
@@ -584,7 +679,12 @@ export function TlsCertificateTool({ framed = true }: { framed?: boolean }) {
 
   return (
     <div className={toolCardClass(framed)}>
-      <ToolHeader icon={ShieldCheck} tone="emerald" title={copy.tls.title} subtitle={copy.tls.subtitle} />
+      <ToolHeader
+        iconBase={toolIconBaseBySlug["tls-certificate"]}
+        tone="emerald"
+        title={copy.tls.title}
+        subtitle={copy.tls.subtitle}
+      />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 md:flex-row">
         <div className="min-w-0 flex-1">
@@ -613,6 +713,39 @@ export function TlsCertificateTool({ framed = true }: { framed?: boolean }) {
 
       {details && certificate ? (
         <div className="mt-6 space-y-6">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <TlsCertificateSummary
+              certificate={certificate}
+              authorized={details.authorized}
+              authorizationError={details.authorizationError}
+              label={`${copy.tls.exactHost}: ${details.target.hostname}:${details.target.port}`}
+              copy={copy}
+            />
+            {details.browserDestination ? (
+              <InfoBlock
+                label={copy.tls.browserHost}
+                value={
+                  <div className="space-y-2">
+                    <p className="break-all font-mono text-cyan-100">{details.browserDestination.url}</p>
+                    <p className="text-sm text-slate-400">
+                      {details.browserDestination.redirects.length} {copy.tls.redirects.toLowerCase()}
+                    </p>
+                  </div>
+                }
+              />
+            ) : null}
+          </div>
+
+          {destinationCertificate ? (
+            <TlsCertificateSummary
+              certificate={destinationCertificate}
+              authorized={details.browserDestinationDetails?.authorized ?? false}
+              authorizationError={details.browserDestinationDetails?.authorizationError ?? null}
+              label={`${copy.tls.browserCertificate}: ${details.browserDestination?.hostname}:${details.browserDestination?.port}`}
+              copy={copy}
+            />
+          ) : null}
+
           <div className="grid gap-4 md:grid-cols-3">
             <InfoBlock
               label={copy.tls.status}
@@ -820,7 +953,6 @@ export function DevToolLauncher() {
             </div>
             <div className="space-y-2">
               {DEV_TOOLS.map((tool) => {
-                const Icon = toolIcons[tool.slug];
                 const { title, subtitle } = getDevToolText(tool.slug, copy);
 
                 return (
@@ -834,9 +966,7 @@ export function DevToolLauncher() {
                     }}
                     className="flex w-full items-start gap-3 rounded-lg border border-slate-700 bg-slate-800/70 p-3 text-left transition-colors hover:border-cyan-500/50 hover:bg-slate-800"
                   >
-                    <span className="rounded-md bg-cyan-500/15 p-2 text-cyan-300">
-                      <Icon className="h-5 w-5" />
-                    </span>
+                    <CustomToolIcon iconBase={tool.iconBase} title={title} size={44} />
                     <span className="min-w-0 flex-1">
                       <span className="block text-base text-white">{title}</span>
                       <span className="mt-1 block text-sm leading-relaxed text-slate-400">{subtitle}</span>
@@ -911,10 +1041,13 @@ export function DevToolFullscreen({ tool }: { tool: DevToolSlug }) {
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="mb-3 text-sm uppercase tracking-[0.24em] text-cyan-300">{copy.kicker}</p>
-            <h1 className="text-4xl text-white md:text-5xl">{title}</h1>
-            <p className="mt-3 max-w-2xl text-slate-300">{subtitle}</p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <CustomToolIcon iconBase={toolIconBaseBySlug[tool]} title={title} size={76} />
+            <div>
+              <p className="mb-3 text-sm uppercase tracking-[0.24em] text-cyan-300">{copy.kicker}</p>
+              <h1 className="text-4xl text-white md:text-5xl">{title}</h1>
+              <p className="mt-3 max-w-2xl text-slate-300">{subtitle}</p>
+            </div>
           </div>
           <Link
             href="/"
