@@ -299,6 +299,7 @@ export const pl: Translations = {
       browserHost: "Docelowy host przeglądarki",
       browserCertificate: "Certyfikat hosta docelowego",
       redirects: "Przekierowania",
+      redirectApplied: "Zrealizowano przekierowanie",
       error: "Nie udało się odczytać certyfikatu TLS dla tego hosta.",
     },
   },

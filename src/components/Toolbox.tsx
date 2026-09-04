@@ -655,7 +655,14 @@ export function TlsCertificateTool({ framed = true }: { framed?: boolean }) {
         throw new Error("error" in payload && payload.error ? payload.error : copy.tls.error);
       }
 
-      setDetails(payload as TlsCertificateResponse);
+      const certificateDetails = payload as TlsCertificateResponse;
+      const redirects = certificateDetails.browserDestination?.redirects ?? [];
+
+      setDetails(certificateDetails);
+
+      if (redirects.length > 0 && certificateDetails.browserDestination) {
+        setTarget(certificateDetails.browserDestination.url);
+      }
     } catch (submitError) {
       setDetails(null);
       setError(submitError instanceof Error ? submitError.message : copy.tls.error);
@@ -671,6 +678,15 @@ export function TlsCertificateTool({ framed = true }: { framed?: boolean }) {
   const checkedAt = details ? formatDate(details.checkedAt, locale) : "";
   const altNames = certificate?.subjectAltName ?? [];
   const destinationCertificate = details?.browserDestinationDetails?.certificate;
+  const appliedRedirects = details?.browserDestination?.redirects ?? [];
+  const redirectNotice =
+    details?.browserDestination && appliedRedirects.length > 0 && target === details.browserDestination.url
+      ? {
+          from: appliedRedirects[0].from,
+          to: details.browserDestination.url,
+          count: appliedRedirects.length,
+        }
+      : null;
   const fingerprints = [
     certificate?.fingerprint256 ? ["SHA-256", certificate.fingerprint256] : null,
     certificate?.fingerprint ? ["SHA-1", certificate.fingerprint] : null,
@@ -699,6 +715,16 @@ export function TlsCertificateTool({ framed = true }: { framed?: boolean }) {
             spellCheck={false}
             className="w-full rounded-lg border border-slate-600 bg-slate-950/70 px-4 py-3 font-mono text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-400"
           />
+          {redirectNotice ? (
+            <div className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-100">
+              <p>
+                {copy.tls.redirectApplied}: {redirectNotice.count} {copy.tls.redirects.toLowerCase()}
+              </p>
+              <p className="mt-1 break-all font-mono text-xs text-cyan-200">
+                {redirectNotice.from} -&gt; {redirectNotice.to}
+              </p>
+            </div>
+          ) : null}
         </div>
         <button
           type="submit"

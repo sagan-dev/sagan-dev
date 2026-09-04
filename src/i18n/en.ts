@@ -297,6 +297,7 @@ export const en = {
       browserHost: "Browser destination",
       browserCertificate: "Browser destination certificate",
       redirects: "Redirects",
+      redirectApplied: "Redirect applied",
       error: "Could not read the TLS certificate for this host.",
     },
   },
