@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import { Braces, Clock3, KeyRound, Maximize2, ShieldCheck, Wrench, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,15 +11,60 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { DEV_TOOLS, type DevToolSlug } from "@/lib/dev-tools";
 
 type JsonRecord = Record<string, unknown>;
+type ToolboxCopy = ReturnType<typeof useLanguage>["t"]["toolbox"];
 
 interface DecodedJwt {
   header: JsonRecord;
   payload: JsonRecord;
 }
 
+interface TlsCertificateName {
+  C?: string;
+  ST?: string;
+  L?: string;
+  O?: string;
+  OU?: string;
+  CN?: string;
+}
+
+interface TlsCertificateInfo {
+  subject?: TlsCertificateName;
+  issuer?: TlsCertificateName;
+  subjectAltName?: string[];
+  validFrom?: string;
+  validTo?: string;
+  serialNumber?: string;
+  fingerprint?: string;
+  fingerprint256?: string;
+  fingerprint512?: string;
+  publicKeyAlgorithm?: string;
+  publicKeyBits?: number;
+  signatureAlgorithm?: string;
+  ca?: boolean;
+}
+
+interface TlsCertificateResponse {
+  target: {
+    hostname: string;
+    port: number;
+  };
+  checkedAt: string;
+  authorized: boolean;
+  authorizationError: string | null;
+  protocol: string | null;
+  cipher: {
+    name?: string;
+    standardName?: string;
+    version?: string;
+  };
+  certificate: TlsCertificateInfo;
+  chain: TlsCertificateInfo[];
+}
+
 const toolIcons: Record<DevToolSlug, LucideIcon> = {
   "jwt-decoder": KeyRound,
   "linux-time": Clock3,
+  "tls-certificate": ShieldCheck,
 };
 
 function decodeBase64UrlJson(part: string): JsonRecord {
@@ -110,6 +156,23 @@ function formatDateTime(seconds: number, locale: string) {
   }).format(new Date(seconds * 1000));
 }
 
+function formatDate(value: string | undefined, locale: string) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "full",
+    timeStyle: "medium",
+  }).format(date);
+}
+
 function formatDuration(seconds: number, locale: string) {
   const absolute = Math.max(0, Math.round(Math.abs(seconds)));
   const formatter = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
@@ -170,6 +233,23 @@ function stringifyClaim(value: unknown) {
   }
 
   return JSON.stringify(value, null, 2) ?? "";
+}
+
+function formatCertificateName(name?: TlsCertificateName) {
+  if (!name) {
+    return "";
+  }
+
+  return [name.CN, name.O, name.OU, name.L, name.ST, name.C].filter(Boolean).join(", ");
+}
+
+function InfoBlock({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
+      <p className="mb-2 text-sm text-slate-400">{label}</p>
+      <div className="break-words text-base leading-relaxed text-slate-100">{value}</div>
+    </div>
+  );
 }
 
 function useLiveNow() {
@@ -238,11 +318,16 @@ function ToolHeader({
   subtitle,
 }: {
   icon: LucideIcon;
-  tone: "cyan" | "blue";
+  tone: "cyan" | "blue" | "emerald";
   title: string;
   subtitle: string;
 }) {
-  const color = tone === "cyan" ? "bg-cyan-500/15 text-cyan-300" : "bg-blue-500/15 text-blue-300";
+  const color =
+    tone === "cyan"
+      ? "bg-cyan-500/15 text-cyan-300"
+      : tone === "blue"
+        ? "bg-blue-500/15 text-blue-300"
+        : "bg-emerald-500/15 text-emerald-300";
 
   return (
     <div className="mb-5 flex items-center gap-3">
@@ -447,8 +532,214 @@ export function LinuxTimeTool({ framed = true }: { framed?: boolean }) {
   );
 }
 
+export function TlsCertificateTool({ framed = true }: { framed?: boolean }) {
+  const { lang, t } = useLanguage();
+  const locale = lang === "pl" ? "pl-PL" : "en-US";
+  const copy = t.toolbox;
+  const now = useLiveNow();
+  const [target, setTarget] = useState("");
+  const [details, setDetails] = useState<TlsCertificateResponse | null>(null);
+  const [error, setError] = useState("");
+  const [isChecking, setIsChecking] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setIsChecking(true);
+
+    try {
+      const response = await fetch("/api/dev-tools/tls-certificate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ target }),
+      });
+      const payload = (await response.json()) as TlsCertificateResponse | { error?: string };
+
+      if (!response.ok) {
+        throw new Error("error" in payload && payload.error ? payload.error : copy.tls.error);
+      }
+
+      setDetails(payload as TlsCertificateResponse);
+    } catch (submitError) {
+      setDetails(null);
+      setError(submitError instanceof Error ? submitError.message : copy.tls.error);
+    } finally {
+      setIsChecking(false);
+    }
+  }
+
+  const certificate = details?.certificate;
+  const validToSeconds = certificate?.validTo ? new Date(certificate.validTo).getTime() / 1000 : null;
+  const validFrom = formatDate(certificate?.validFrom, locale);
+  const validTo = formatDate(certificate?.validTo, locale);
+  const checkedAt = details ? formatDate(details.checkedAt, locale) : "";
+  const altNames = certificate?.subjectAltName ?? [];
+  const fingerprints = [
+    certificate?.fingerprint256 ? ["SHA-256", certificate.fingerprint256] : null,
+    certificate?.fingerprint ? ["SHA-1", certificate.fingerprint] : null,
+    certificate?.fingerprint512 ? ["SHA-512", certificate.fingerprint512] : null,
+  ].filter((item): item is string[] => Boolean(item));
+
+  return (
+    <div className={toolCardClass(framed)}>
+      <ToolHeader icon={ShieldCheck} tone="emerald" title={copy.tls.title} subtitle={copy.tls.subtitle} />
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 md:flex-row">
+        <div className="min-w-0 flex-1">
+          <label className="mb-2 block text-sm text-slate-300" htmlFor="tls-target">
+            {copy.tls.inputLabel}
+          </label>
+          <input
+            id="tls-target"
+            value={target}
+            onChange={(event) => setTarget(event.target.value)}
+            placeholder={copy.tls.placeholder}
+            spellCheck={false}
+            className="w-full rounded-lg border border-slate-600 bg-slate-950/70 px-4 py-3 font-mono text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-400"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isChecking}
+          className="mt-auto rounded-lg bg-cyan-500 px-5 py-3 text-white transition-colors hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+        >
+          {isChecking ? copy.tls.checking : copy.tls.check}
+        </button>
+      </form>
+
+      {error ? <p className="mt-3 text-sm text-amber-300">{error}</p> : null}
+
+      {details && certificate ? (
+        <div className="mt-6 space-y-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            <InfoBlock
+              label={copy.tls.status}
+              value={
+                <span className={details.authorized ? "text-emerald-300" : "text-amber-300"}>
+                  {details.authorized ? copy.tls.valid : `${copy.tls.invalid}: ${details.authorizationError ?? ""}`}
+                </span>
+              }
+            />
+            <InfoBlock
+              label={copy.tls.expiresIn}
+              value={
+                validToSeconds === null ? (
+                  <span className="text-slate-500">{copy.missing}</span>
+                ) : (
+                  <TimeDelta
+                    timestamp={validToSeconds}
+                    now={now}
+                    locale={locale}
+                    futureLabel={copy.in}
+                    pastLabel={copy.tls.expiredAgo}
+                    emptyLabel={copy.missing}
+                  />
+                )
+              }
+            />
+            <InfoBlock label={copy.tls.checkedAt} value={checkedAt} />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <InfoBlock label={copy.tls.subject} value={formatCertificateName(certificate.subject) || copy.missing} />
+            <InfoBlock label={copy.tls.issuer} value={formatCertificateName(certificate.issuer) || copy.missing} />
+            <InfoBlock label={copy.tls.validFrom} value={validFrom || copy.missing} />
+            <InfoBlock label={copy.tls.validTo} value={validTo || copy.missing} />
+          </div>
+
+          <div>
+            <h4 className="mb-3 text-cyan-300">{copy.tls.altNames}</h4>
+            <PillList items={altNames} emptyLabel={copy.emptyList} />
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <InfoBlock
+              label={copy.tls.connection}
+              value={
+                <dl className="space-y-2">
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-400">{copy.tls.protocol}</dt>
+                    <dd className="text-right font-mono text-cyan-200">{details.protocol ?? copy.missing}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-400">{copy.tls.cipher}</dt>
+                    <dd className="text-right font-mono text-cyan-200">
+                      {details.cipher.standardName ?? details.cipher.name ?? copy.missing}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-400">Host</dt>
+                    <dd className="text-right font-mono text-cyan-200">
+                      {details.target.hostname}:{details.target.port}
+                    </dd>
+                  </div>
+                </dl>
+              }
+            />
+            <InfoBlock
+              label={copy.tls.fingerprints}
+              value={
+                fingerprints.length === 0 ? (
+                  <span className="text-slate-500">{copy.missing}</span>
+                ) : (
+                  <dl className="space-y-3">
+                    {fingerprints.map(([label, value]) => (
+                      <div key={label}>
+                        <dt className="text-sm text-slate-400">{label}</dt>
+                        <dd className="break-all font-mono text-sm text-cyan-100">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )
+              }
+            />
+          </div>
+
+          <div>
+            <h4 className="mb-3 text-cyan-300">{copy.tls.chain}</h4>
+            <div className="space-y-3">
+              {details.chain.map((item, index) => (
+                <div key={`${item.fingerprint256 ?? item.serialNumber ?? index}`} className="rounded-lg border border-slate-700 bg-slate-900/60 p-4">
+                  <div className="mb-2 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                    <p className="text-white">{formatCertificateName(item.subject) || copy.missing}</p>
+                    <p className="text-sm text-slate-400">{item.ca ? "CA" : "Leaf"}</p>
+                  </div>
+                  <p className="text-sm text-slate-400">
+                    {copy.tls.issuer}: {formatCertificateName(item.issuer) || copy.missing}
+                  </p>
+                  <p className="mt-2 break-all font-mono text-xs text-slate-500">{item.fingerprint256}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function DevToolContent({ tool, framed = true }: { tool: DevToolSlug; framed?: boolean }) {
-  return tool === "jwt-decoder" ? <JwtDecoderTool framed={framed} /> : <LinuxTimeTool framed={framed} />;
+  switch (tool) {
+    case "jwt-decoder":
+      return <JwtDecoderTool framed={framed} />;
+    case "linux-time":
+      return <LinuxTimeTool framed={framed} />;
+    case "tls-certificate":
+      return <TlsCertificateTool framed={framed} />;
+  }
+}
+
+function getDevToolText(tool: DevToolSlug, copy: ToolboxCopy) {
+  switch (tool) {
+    case "jwt-decoder":
+      return { title: copy.jwt.title, subtitle: copy.jwt.subtitle };
+    case "linux-time":
+      return { title: copy.unix.title, subtitle: copy.unix.subtitle };
+    case "tls-certificate":
+      return { title: copy.tls.title, subtitle: copy.tls.subtitle };
+  }
 }
 
 export function Toolbox() {
@@ -530,8 +821,7 @@ export function DevToolLauncher() {
             <div className="space-y-2">
               {DEV_TOOLS.map((tool) => {
                 const Icon = toolIcons[tool.slug];
-                const label = tool.key === "jwt" ? copy.jwt.title : copy.unix.title;
-                const subtitle = tool.key === "jwt" ? copy.jwt.subtitle : copy.unix.subtitle;
+                const { title, subtitle } = getDevToolText(tool.slug, copy);
 
                 return (
                   <button
@@ -548,7 +838,7 @@ export function DevToolLauncher() {
                       <Icon className="h-5 w-5" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-base text-white">{label}</span>
+                      <span className="block text-base text-white">{title}</span>
                       <span className="mt-1 block text-sm leading-relaxed text-slate-400">{subtitle}</span>
                     </span>
                   </button>
@@ -576,9 +866,7 @@ export function DevToolLauncher() {
             <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">{copy.kicker}</p>
-                <h2 className="text-xl text-white">
-                  {activeTool === "jwt-decoder" ? copy.jwt.title : copy.unix.title}
-                </h2>
+                <h2 className="text-xl text-white">{getDevToolText(activeTool, copy).title}</h2>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -617,8 +905,7 @@ export function DevToolLauncher() {
 export function DevToolFullscreen({ tool }: { tool: DevToolSlug }) {
   const { t } = useLanguage();
   const copy = t.toolbox;
-  const title = tool === "jwt-decoder" ? copy.jwt.title : copy.unix.title;
-  const subtitle = tool === "jwt-decoder" ? copy.jwt.subtitle : copy.unix.subtitle;
+  const { title, subtitle } = getDevToolText(tool, copy);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-20 md:px-12 lg:px-24">

@@ -13,6 +13,13 @@ export const DEV_TOOLS = [
     description:
       "Convert Unix timestamps to readable dates and see live time distance to or from a timestamp.",
   },
+  {
+    slug: "tls-certificate",
+    key: "tls",
+    title: "TLS Certificate Inspector",
+    description:
+      "Inspect public HTTPS certificate details, validity, issuer, subject alternative names, fingerprints and chain.",
+  },
 ] as const;
 
 export type DevToolSlug = (typeof DEV_TOOLS)[number]["slug"];
