@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wsparcie — Standup - Desk Remote Control</title>
+<meta name="description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript.">
+<link rel="canonical" href="https://sagan.dev/apps/standup/pl/support">
+<link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
+<link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
+<link rel="alternate" hreflang="x-default" href="https://sagan.dev/apps/standup/support">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Wsparcie — Standup - Desk Remote Control">
+<meta property="og:description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript.">
+<meta property="og:url" content="https://sagan.dev/apps/standup/pl/support">
+<meta property="og:image" content="https://sagan.dev/apps/standup/assets/icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#1f6bff">
+<link rel="icon" type="image/png" sizes="32x32" href="/apps/standup/assets/favicon-32.png">
+<link rel="apple-touch-icon" href="/apps/standup/assets/apple-touch-icon.png">
+<link rel="stylesheet" href="/apps/standup/style.css?v=3">
+</head>
+<body class="">
+<header class="site"><div class="wrap">
+  <a class="brand" href="/apps/standup/pl/"><img src="/apps/standup/assets/icon.png" width="28" height="28" alt=""><span>Standup</span></a>
+  <nav class="main" aria-label="Main">
+    <a class="hide-sm" href="/apps/standup/pl/#features">Funkcje</a>
+    <a href="/apps/standup/pl/privacy">Prywatność</a>
+    <a href="/apps/standup/pl/support">Wsparcie</a>
+    <a class="lang" href="https://sagan.dev/apps/standup/support" hreflang="en" lang="en">EN</a>
+  </nav>
+</div></header>
+<main>
+<div class="wrap"><article class="doc"><h1>Wsparcie</h1><p class="meta">Odpowiedzi na częste pytania. Nadal nie działa? Napisz na <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>.</p><details><summary>Standup nie widzi mojego biurka</summary><p>Spróbuj po kolei:</p><ol>
+<li>Zamknij każdą inną aplikację połączoną z biurkiem (aplikację na telefonie, inny Mac). Biurko rozmawia z jednym urządzeniem naraz.</li>
+<li>Zezwól Standupowi na Bluetooth w <em>Ustawieniach systemowych → Prywatność i ochrona → Bluetooth</em>.</li>
+<li>Upewnij się, że nazwa biurka w Bluetooth nadal zawiera słowo „Desk”.</li>
+<li>Zresetuj biurko: opuść je do samego dołu, przytrzymaj przycisk w dół, aż biurko podskoczy w dół i w górę, potem przytrzymaj przycisk Bluetooth na sterowniku, aż dioda zacznie migać, i otwórz Standup ponownie.</li></ol></details>
+<details><summary>Jak używać spotkań z Outlooka?</summary><p>Standup czyta Kalendarz macOS. Dodaj konto Outlook, Exchange lub Microsoft 365 w <em>Ustawieniach systemowych → Konta internetowe</em> i upewnij się, że Kalendarze są dla niego włączone. Konto pojawi się wtedy w aplikacji Kalendarz, a Standup zobaczy jego spotkania. Zezwól na dostęp do kalendarza, gdy Standup o to poprosi.</p></details>
+<details><summary>Które spotkania podnoszą biurko?</summary><p>Takie, które mają innych uczestników, zawierają link do spotkania online (Teams, Meet, Zoom, Webex, Whereby lub GoToMeeting) w adresie URL, lokalizacji lub notatkach i które organizujesz albo zaakceptowałeś. Wydarzenia całodniowe, odwołane, odrzucone, wstępnie zaakceptowane lub bez odpowiedzi oraz oznaczone jako „wolny” są pomijane. Biurko zaczyna się podnosić kilka minut przed startem (czas możesz zmienić w Preferencjach).</p></details>
+<details><summary>Dlaczego biurko nie ruszyło na moje spotkanie?</summary><p>Sprawdź, czy funkcja jest włączona (<em>Stand during meetings</em>), czy spotkanie spełnia powyższe zasady i czy biurko jest połączone. Jeśli sam opuściłeś biurko w trakcie spotkania, Standup nie podniesie go ponownie w tym spotkaniu.</p></details>
+<details><summary>Co to za małe szturchnięcie przed ruchem biurka?</summary><p>Przed automatycznym ruchem biurko dwa razy delikatnie szturcha w stronę, w którą zaraz pojedzie, i czeka sekundę, więc nigdy nie rusza bez ostrzeżenia. Wyłączysz to w Preferencjach opcją <em>Nudge the desk before it moves</em>. Ruchy, które sam uruchamiasz, są zawsze natychmiastowe.</p></details>
+<details><summary>Co robi wykrywanie rozmów i czy mój dźwięk jest nagrywany?</summary><p>Jeśli włączysz <em>Keep raised while on a call</em>, biurko zostaje w górze po zaplanowanym końcu, dopóki aplikacja spotkaniowa używa mikrofonu lub głośnika, i opuszcza się krótko po ich ucichnięciu. Standup widzi tylko, <em>że</em> aplikacja używa dźwięku i która — nigdy niczego nie nagrywa ani nie ma dostępu do dźwięku czy obrazu i nie prosi o dostęp do mikrofonu ani kamery.</p></details>
+<details><summary>Biurko zatrzymuje się trochę przed albo za wysokością presetu</summary><p>Standup uczy się, ile Twoje biurko jeszcze jedzie po zatrzymaniu, i koryguje się po kilku ruchach. Jeśli nadal myli się o więcej niż pół centymetra, napisz do nas i podaj obie wysokości.</p></details>
+<details><summary>Czy mogę sterować biurkiem ze skryptu albo Skrótów?</summary><p>Tak. Standup rozumie te polecenia AppleScript:</p>
+<pre><code>tell application "Standup" to move desk "stand"    -- lub "sit", "up", "down"
+tell application "Standup" to set desk height "120cm"  -- lub "48in", albo samo "80"</code></pre>
+<p>W Skrótach dodaj akcję <em>Uruchom AppleScript</em> z jedną z tych linii. macOS raz zapyta o zgodę na sterowanie Standupem.</p></details>
+<details><summary>Jak uruchamiać Standup przy logowaniu albo go zamknąć?</summary><p>Otwórz <em>Preferencje</em> z menu „…” w popoverze i włącz <em>Open at login</em>. Wybierz <em>Quit</em> z tego samego menu, żeby zamknąć aplikację.</p></details><h2>Kontakt</h2><p>E-mail: <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>. Darmowa wersja open source (bez automatyzacji spotkań) przyjmuje zgłoszenia błędów na <a href="https://github.com/sagan-dev/Standup/issues">GitHubie</a>.</p></article></div>
+</main>
+<footer class="site"><div class="wrap">
+  <div>Stworzone przez <a href="https://sagan.dev">Michała Sagana</a> · <a href="https://sagan.dev">sagan.dev</a></div>
+  <div><a href="/apps/standup/pl/privacy">Prywatność</a> · <a href="/apps/standup/pl/support">Wsparcie</a> · <a href="https://github.com/sagan-dev/Standup">Wersja open source</a></div>
+  <div style="flex-basis:100%;font-size:13px">Standup jest niezależną aplikacją i nie jest powiązany z firmami IKEA ani Linak, ani przez nie wspierany czy sponsorowany. Nazwy produktów służą wyłącznie do opisu zgodności.</div>
+</div></footer>
+</body>
+</html>

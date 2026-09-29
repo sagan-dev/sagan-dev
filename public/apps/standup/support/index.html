@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support — Standup - Desk Remote Control</title>
+<meta name="description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript.">
+<link rel="canonical" href="https://sagan.dev/apps/standup/support">
+<link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
+<link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
+<link rel="alternate" hreflang="x-default" href="https://sagan.dev/apps/standup/support">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Support — Standup - Desk Remote Control">
+<meta property="og:description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript.">
+<meta property="og:url" content="https://sagan.dev/apps/standup/support">
+<meta property="og:image" content="https://sagan.dev/apps/standup/assets/icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#1f6bff">
+<link rel="icon" type="image/png" sizes="32x32" href="/apps/standup/assets/favicon-32.png">
+<link rel="apple-touch-icon" href="/apps/standup/assets/apple-touch-icon.png">
+<link rel="stylesheet" href="/apps/standup/style.css?v=3">
+</head>
+<body class="">
+<header class="site"><div class="wrap">
+  <a class="brand" href="/apps/standup"><img src="/apps/standup/assets/icon.png" width="28" height="28" alt=""><span>Standup</span></a>
+  <nav class="main" aria-label="Main">
+    <a class="hide-sm" href="/apps/standup/#features">Features</a>
+    <a href="/apps/standup/privacy">Privacy</a>
+    <a href="/apps/standup/support">Support</a>
+    <a class="lang" href="https://sagan.dev/apps/standup/pl/support" hreflang="pl" lang="pl">PL</a>
+  </nav>
+</div></header>
+<main>
+<div class="wrap"><article class="doc"><h1>Support</h1><p class="meta">Answers to common questions. Still stuck? Write to <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>.</p><details><summary>Standup can't find my desk</summary><p>Try these in order:</p><ol>
+<li>Close any other app connected to the desk (a phone app, another Mac). The desk talks to one device at a time.</li>
+<li>Allow Bluetooth for Standup in <em>System Settings → Privacy &amp; Security → Bluetooth</em>.</li>
+<li>Make sure the desk's name in Bluetooth still contains the word "Desk".</li>
+<li>Reset the desk: lower it as far as it goes, hold the lower button until the desk jumps down and up, then hold the Bluetooth button on the controller until the light blinks, and open Standup again.</li></ol></details>
+<details><summary>How do I use Outlook meetings?</summary><p>Standup reads the macOS Calendar. Add your Outlook, Exchange or Microsoft 365 account in <em>System Settings → Internet Accounts</em> and make sure Calendars is switched on for it. The account then shows up in the Calendar app and Standup sees its meetings. Allow calendar access when Standup asks.</p></details>
+<details><summary>Which meetings raise the desk?</summary><p>Meetings that have other attendees, contain an online meeting link (Teams, Meet, Zoom, Webex, Whereby or GoToMeeting) in the URL, location or notes, and that you organise or have accepted. All-day events, cancelled, declined, tentative or unanswered invitations and events marked as "free" are ignored. The desk starts rising a couple of minutes before the start (you can change the lead time in Preferences).</p></details>
+<details><summary>Why did the desk not move for my meeting?</summary><p>Check that the feature is on (<em>Stand during meetings</em>), that the meeting matches the rules above, and that the desk is connected. If you lowered the desk yourself during a meeting, Standup does not raise it again for that meeting.</p></details>
+<details><summary>What is the little nudge before the desk moves?</summary><p>Before an automatic move the desk nudges twice in the direction it is about to travel and waits a second, so it never moves without a warning. Turn it off in Preferences with <em>Nudge the desk before it moves</em>. Moves you start yourself are always immediate.</p></details>
+<details><summary>What does call detection do, and is my audio recorded?</summary><p>If you turn on <em>Keep raised while on a call</em>, the desk stays up after the scheduled end while a meeting app is still using the microphone or speaker, and goes down shortly after they go quiet. Standup only sees <em>that</em> an app is using audio and which app — it never records or accesses any audio or video, and it does not ask for microphone or camera permission.</p></details>
+<details><summary>The desk stops a little short or a little past my preset height</summary><p>Standup learns how far your desk rolls after a stop and corrects itself after a few moves. If it stays off by more than about half a centimetre, write to us with the two heights.</p></details>
+<details><summary>Can I control the desk from a script or Shortcuts?</summary><p>Yes. Standup understands these AppleScript commands:</p>
+<pre><code>tell application "Standup" to move desk "stand"    -- or "sit", "up", "down"
+tell application "Standup" to set desk height "120cm"  -- or "48in", or just "80"</code></pre>
+<p>In Shortcuts, add a <em>Run AppleScript</em> action with one of those lines. macOS asks once for permission to control Standup.</p></details>
+<details><summary>How do I start Standup at login, or quit it?</summary><p>Open <em>Preferences</em> from the "…" menu in the popover and switch on <em>Open at login</em>. Choose <em>Quit</em> from the same menu to close the app.</p></details><h2>Contact</h2><p>Email: <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>. The free open-source edition (without meeting automation) takes bug reports on <a href="https://github.com/sagan-dev/Standup/issues">GitHub</a>.</p></article></div>
+</main>
+<footer class="site"><div class="wrap">
+  <div>Made by <a href="https://sagan.dev">Michal Sagan</a> · <a href="https://sagan.dev">sagan.dev</a></div>
+  <div><a href="/apps/standup/privacy">Privacy</a> · <a href="/apps/standup/support">Support</a> · <a href="https://github.com/sagan-dev/Standup">Open-source edition</a></div>
+  <div style="flex-basis:100%;font-size:13px">Standup is an independent app and is not affiliated with, endorsed by or sponsored by IKEA or Linak. Product names are used only to describe compatibility.</div>
+</div></footer>
+</body>
+</html>

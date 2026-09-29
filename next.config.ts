@@ -52,6 +52,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Standup app pages: static HTML in public/apps/standup, served on clean URLs
+  async rewrites() {
+    const pages = ["", "/privacy", "/support", "/pl", "/pl/privacy", "/pl/support"];
+    return pages.map((page) => ({
+      source: `/apps/standup${page}`,
+      destination: `/apps/standup${page}/index.html`,
+    }));
+  },
   async headers() {
     return [
       {
