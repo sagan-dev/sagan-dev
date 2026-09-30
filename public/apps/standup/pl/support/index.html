@@ -75,6 +75,69 @@ actions:
         sequence:
           - action: scene.turn_on
             target: { entity_id: scene.office_focus }</code></pre></details>
+<details id="webhook-test"><summary>Jak wypróbować scenę w Home Assistant przyciskiem „Send test”? (wkrótce)</summary><p>Domyślnie <em>Send test</em> sprawdza tylko połączenie — wysyła <code>"event": "test"</code>, które nie oznacza początku spotkania. Żeby przycisk włączał i wyłączał scenę spotkania, niech webhook steruje pomocnikiem (<code>input_boolean</code>), a scenę podepnij pod ten pomocnik. Pierwszy test włącza scenę, drugi ją wyłącza i przywraca światła. Wklej to do pakietu (np. <code>packages/standup.yaml</code>) i podmień światła na swoje:</p>
+<pre><code>input_boolean:
+  standup_meeting:
+    name: "Standup meeting"
+
+automation:
+  - alias: "Standup - webhook"
+    mode: queued
+    triggers:
+      - trigger: webhook
+        webhook_id: standup-YOUR-RANDOM-ID
+        allowed_methods: [POST]
+        local_only: false
+    actions:
+      - choose:
+          - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+            sequence:
+              - action: input_boolean.turn_on
+                target: { entity_id: input_boolean.standup_meeting }
+          - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+            sequence:
+              - action: input_boolean.turn_off
+                target: { entity_id: input_boolean.standup_meeting }
+          # "Send test" switches the meeting scene on, the next test switches it off
+          - conditions: "{{ trigger.json.event == 'test' }}"
+            sequence:
+              - action: input_boolean.toggle
+                target: { entity_id: input_boolean.standup_meeting }
+
+  - alias: "Standup - meeting scene"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "off"
+        to: "on"
+    actions:
+      # Remember the lights first, so they can be restored afterwards
+      - action: scene.create
+        data:
+          scene_id: standup_before_meeting
+          snapshot_entities: [light.living_room, light.hallway, light.desk_lamp]
+      - action: light.turn_off
+        target: { entity_id: [light.living_room, light.hallway] }
+      - action: light.turn_on
+        target: { entity_id: light.desk_lamp }
+
+  - alias: "Standup - after the meeting"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "on"
+        to: "off"
+    conditions:
+      - condition: template
+        value_template: "{{ states.scene.standup_before_meeting is not none }}"
+    actions:
+      - action: scene.turn_on
+        target: { entity_id: scene.standup_before_meeting }</code></pre>
+<p>Wskazówki:</p><ul>
+<li>Jeśli Home Assistant jest dostępny z internetu, użyj długiego, losowego <code>webhook_id</code> — tylko adres chroni webhook.</li>
+<li>Nie sprawdzaj, czy zapisana scena ma stan <code>unknown</code>: scena utworzona przez <code>scene.create</code> ma ten stan, dopóki nie zostanie użyta, więc taki warunek zablokowałby przywracanie świateł.</li>
+<li>Kliknij <em>Send test</em> raz, poczekaj na scenę i kliknij ponownie. Szybkie wielokrotne klikanie może sprawić, że scena zapamięta już zgaszone światła.</li>
+<li>Po edycji pakietu przeładuj automatyzacje i pomocniki (albo zrestartuj Home Assistant).</li></ul></details>
 <details><summary>Czy mogę sterować biurkiem skrótami klawiszowymi?</summary><p>Tak, przez aplikację Skróty. Utwórz osobny skrót dla każdej akcji:</p><ol>
 <li>Otwórz <em>Skróty</em> i utwórz nowy skrót, np. „Biurko: wstań”.</li>
 <li>Dodaj akcję <em>Uruchom AppleScript</em> z poleceniem <code>tell application "Standup" to move desk "stand"</code>. W pozostałych skrótach użyj <code>"sit"</code>, <code>"up"</code> albo <code>"down"</code>.</li>

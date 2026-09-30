@@ -75,6 +75,69 @@ actions:
         sequence:
           - action: scene.turn_on
             target: { entity_id: scene.office_focus }</code></pre></details>
+<details id="webhook-test"><summary>How do I try my Home Assistant scene with "Send test"? (coming soon)</summary><p>By default <em>Send test</em> only checks the connection — it sends <code>"event": "test"</code>, which does not start a meeting. To use the button as an on/off switch for your meeting scene, let the webhook drive a helper (<code>input_boolean</code>) and attach the scene to that helper. The first test then switches the scene on, the second one switches it off and restores the lights. Put this in a package (for example <code>packages/standup.yaml</code>) and adjust the lights:</p>
+<pre><code>input_boolean:
+  standup_meeting:
+    name: "Standup meeting"
+
+automation:
+  - alias: "Standup - webhook"
+    mode: queued
+    triggers:
+      - trigger: webhook
+        webhook_id: standup-YOUR-RANDOM-ID
+        allowed_methods: [POST]
+        local_only: false
+    actions:
+      - choose:
+          - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+            sequence:
+              - action: input_boolean.turn_on
+                target: { entity_id: input_boolean.standup_meeting }
+          - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+            sequence:
+              - action: input_boolean.turn_off
+                target: { entity_id: input_boolean.standup_meeting }
+          # "Send test" switches the meeting scene on, the next test switches it off
+          - conditions: "{{ trigger.json.event == 'test' }}"
+            sequence:
+              - action: input_boolean.toggle
+                target: { entity_id: input_boolean.standup_meeting }
+
+  - alias: "Standup - meeting scene"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "off"
+        to: "on"
+    actions:
+      # Remember the lights first, so they can be restored afterwards
+      - action: scene.create
+        data:
+          scene_id: standup_before_meeting
+          snapshot_entities: [light.living_room, light.hallway, light.desk_lamp]
+      - action: light.turn_off
+        target: { entity_id: [light.living_room, light.hallway] }
+      - action: light.turn_on
+        target: { entity_id: light.desk_lamp }
+
+  - alias: "Standup - after the meeting"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "on"
+        to: "off"
+    conditions:
+      - condition: template
+        value_template: "{{ states.scene.standup_before_meeting is not none }}"
+    actions:
+      - action: scene.turn_on
+        target: { entity_id: scene.standup_before_meeting }</code></pre>
+<p>Tips:</p><ul>
+<li>Use a long random <code>webhook_id</code> if Home Assistant is reachable from the internet — the URL is the only thing protecting it.</li>
+<li>Don't check the saved scene for the state <code>unknown</code>: a scene made by <code>scene.create</code> stays <code>unknown</code> until it is used, so such a condition would stop the lights from ever coming back.</li>
+<li>Click <em>Send test</em> once, wait for the scene, then click again. Clicking many times quickly can make the scene remember lights that are already off.</li>
+<li>Reload automations and helpers (or restart Home Assistant) after editing the package.</li></ul></details>
 <details><summary>Can I move the desk with keyboard shortcuts?</summary><p>Yes, with the Shortcuts app. Make one shortcut for each action:</p><ol>
 <li>Open <em>Shortcuts</em> and create a new shortcut, for example "Desk: stand".</li>
 <li>Add a <em>Run AppleScript</em> action with <code>tell application "Standup" to move desk "stand"</code>. For the other shortcuts use <code>"sit"</code>, <code>"up"</code> or <code>"down"</code>.</li>
