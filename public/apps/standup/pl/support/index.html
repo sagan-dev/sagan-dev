@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wsparcie — Standup - Desk Remote Control</title>
-<meta name="description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript.">
+<meta name="description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript, skróty klawiszowe.">
 <link rel="canonical" href="https://sagan.dev/apps/standup/pl/support">
 <link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
 <link rel="alternate" hreflang="x-default" href="https://sagan.dev/apps/standup/support">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Wsparcie — Standup - Desk Remote Control">
-<meta property="og:description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript.">
+<meta property="og:description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript, skróty klawiszowe.">
 <meta property="og:url" content="https://sagan.dev/apps/standup/pl/support">
 <meta property="og:image" content="https://sagan.dev/apps/standup/assets/icon.png">
 <meta name="twitter:card" content="summary">
@@ -46,6 +46,12 @@
 <pre><code>tell application "Standup" to move desk "stand"    -- lub "sit", "up", "down"
 tell application "Standup" to set desk height "120cm"  -- lub "48in", albo samo "80"</code></pre>
 <p>W Skrótach dodaj akcję <em>Uruchom AppleScript</em> z jedną z tych linii. macOS raz zapyta o zgodę na sterowanie Standupem.</p></details>
+<details><summary>Czy mogę sterować biurkiem skrótami klawiszowymi?</summary><p>Tak, przez aplikację Skróty. Utwórz osobny skrót dla każdej akcji:</p><ol>
+<li>Otwórz <em>Skróty</em> i utwórz nowy skrót, np. „Biurko: wstań”.</li>
+<li>Dodaj akcję <em>Uruchom AppleScript</em> z poleceniem <code>tell application "Standup" to move desk "stand"</code>. W pozostałych skrótach użyj <code>"sit"</code>, <code>"up"</code> albo <code>"down"</code>.</li>
+<li>Otwórz informacje o skrócie (ⓘ), wybierz <em>Dodaj skrót klawiszowy</em> i naciśnij klawisze, np. ⌃⌥↑ / ⌃⌥↓ dla góry i dołu oraz ⌃⌥S / ⌃⌥D dla wstań i siadaj.</li>
+<li>Przy pierwszym użyciu zezwól Skrótom na sterowanie Standupem.</li></ol>
+<p>Skróty działają w każdej aplikacji. <code>up</code> i <code>down</code> przesuwają biurko o ok. 1 cm na jedno naciśnięcie; przytrzymanie klawiszy nie utrzymuje ruchu.</p></details>
 <details><summary>Jak uruchamiać Standup przy logowaniu albo go zamknąć?</summary><p>Otwórz <em>Preferencje</em> z menu „…” w popoverze i włącz <em>Open at login</em>. Wybierz <em>Quit</em> z tego samego menu, żeby zamknąć aplikację.</p></details><h2>Kontakt</h2><p>E-mail: <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>. Darmowa wersja open source (bez automatyzacji spotkań) przyjmuje zgłoszenia błędów na <a href="https://github.com/sagan-dev/Standup/issues">GitHubie</a>.</p></article></div>
 </main>
 <footer class="site"><div class="wrap">

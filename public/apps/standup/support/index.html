@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support — Standup - Desk Remote Control</title>
-<meta name="description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript.">
+<meta name="description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript, keyboard shortcuts.">
 <link rel="canonical" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
 <link rel="alternate" hreflang="x-default" href="https://sagan.dev/apps/standup/support">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Support — Standup - Desk Remote Control">
-<meta property="og:description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript.">
+<meta property="og:description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript, keyboard shortcuts.">
 <meta property="og:url" content="https://sagan.dev/apps/standup/support">
 <meta property="og:image" content="https://sagan.dev/apps/standup/assets/icon.png">
 <meta name="twitter:card" content="summary">
@@ -46,6 +46,12 @@
 <pre><code>tell application "Standup" to move desk "stand"    -- or "sit", "up", "down"
 tell application "Standup" to set desk height "120cm"  -- or "48in", or just "80"</code></pre>
 <p>In Shortcuts, add a <em>Run AppleScript</em> action with one of those lines. macOS asks once for permission to control Standup.</p></details>
+<details><summary>Can I move the desk with keyboard shortcuts?</summary><p>Yes, with the Shortcuts app. Make one shortcut for each action:</p><ol>
+<li>Open <em>Shortcuts</em> and create a new shortcut, for example "Desk: stand".</li>
+<li>Add a <em>Run AppleScript</em> action with <code>tell application "Standup" to move desk "stand"</code>. For the other shortcuts use <code>"sit"</code>, <code>"up"</code> or <code>"down"</code>.</li>
+<li>Open the shortcut's details (ⓘ), choose <em>Add Keyboard Shortcut</em> and press the keys, for example ⌃⌥↑ / ⌃⌥↓ for up and down and ⌃⌥S / ⌃⌥D for stand and sit.</li>
+<li>The first time you use it, allow Shortcuts to control Standup.</li></ol>
+<p>The shortcuts work in every app. <code>up</code> and <code>down</code> move the desk about 1 cm per press; holding the keys does not keep it moving.</p></details>
 <details><summary>How do I start Standup at login, or quit it?</summary><p>Open <em>Preferences</em> from the "…" menu in the popover and switch on <em>Open at login</em>. Choose <em>Quit</em> from the same menu to close the app.</p></details><h2>Contact</h2><p>Email: <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>. The free open-source edition (without meeting automation) takes bug reports on <a href="https://github.com/sagan-dev/Standup/issues">GitHub</a>.</p></article></div>
 </main>
 <footer class="site"><div class="wrap">
