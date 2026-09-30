@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wsparcie — Standup - Desk Remote Control</title>
-<meta name="description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript, skróty klawiszowe.">
+<meta name="description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript, skróty klawiszowe, webhooki.">
 <link rel="canonical" href="https://sagan.dev/apps/standup/pl/support">
 <link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
@@ -46,6 +46,35 @@
 <pre><code>tell application "Standup" to move desk "stand"    -- lub "sit", "up", "down"
 tell application "Standup" to set desk height "120cm"  -- lub "48in", albo samo "80"</code></pre>
 <p>W Skrótach dodaj akcję <em>Uruchom AppleScript</em> z jedną z tych linii. macOS raz zapyta o zgodę na sterowanie Standupem.</p></details>
+<details><summary>Spotkanie skończyło się wcześniej — czy biurko może zjechać szybciej?</summary><p>Tak, przy włączonym <em>Keep raised while on a call</em>. Gdy mikrofon i głośnik aplikacji do spotkań ucichną przed planowym końcem, powiadomienie zapyta <em>Meeting over? Lower the desk?</em>. Po połowie spotkania pyta od razu; w pierwszej połowie czeka dwie minuty ciszy, na wypadek gdyby tylko zerwało połączenie. Pyta raz na spotkanie i tylko wtedy, gdy biurko jest w górze.</p></details>
+<details id="webhooks"><summary>Czy Standup może przełączać sceny w Home Assistant? (wkrótce)</summary><p><strong>Wkrótce</strong> — tej funkcji nie ma jeszcze w obecnej wersji z App Store. W <em>Preferences → Webhook</em> wpiszesz adres webhooka. Gdy biurko podniesie się na spotkanie i gdy zjedzie po nim, Standup wyśle <code>POST</code> z krótkim JSON-em:</p>
+<pre><code>{
+  "app": "Standup",
+  "event": "meeting_started",
+  "source": "calendar",
+  "meeting": "Weekly sync",
+  "desk": "stand",
+  "height_cm": 110.2,
+  "timestamp": "2026-10-01T09:58:00Z"
+}</code></pre>
+<p><code>event</code> to <code>meeting_started</code> albo <code>meeting_ended</code>, <code>source</code> to <code>calendar</code> albo <code>unplanned_call</code>. Ręczne ruszanie biurkiem niczego nie wysyła. Przycisk <em>Send test</em> sprawdza połączenie.</p>
+<p>W Home Assistant utwórz automatyzację z wyzwalaczem webhook i wpisz w Standupie adres <code>http://homeassistant.local:8123/api/webhook/standup</code>:</p>
+<pre><code>alias: Standup meetings
+triggers:
+  - trigger: webhook
+    webhook_id: standup
+    allowed_methods: [POST]
+    local_only: true
+actions:
+  - choose:
+      - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_meeting }
+      - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_focus }</code></pre></details>
 <details><summary>Czy mogę sterować biurkiem skrótami klawiszowymi?</summary><p>Tak, przez aplikację Skróty. Utwórz osobny skrót dla każdej akcji:</p><ol>
 <li>Otwórz <em>Skróty</em> i utwórz nowy skrót, np. „Biurko: wstań”.</li>
 <li>Dodaj akcję <em>Uruchom AppleScript</em> z poleceniem <code>tell application "Standup" to move desk "stand"</code>. W pozostałych skrótach użyj <code>"sit"</code>, <code>"up"</code> albo <code>"down"</code>.</li>

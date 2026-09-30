@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support — Standup - Desk Remote Control</title>
-<meta name="description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript, keyboard shortcuts.">
+<meta name="description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript, keyboard shortcuts, webhooks.">
 <link rel="canonical" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
@@ -46,6 +46,35 @@
 <pre><code>tell application "Standup" to move desk "stand"    -- or "sit", "up", "down"
 tell application "Standup" to set desk height "120cm"  -- or "48in", or just "80"</code></pre>
 <p>In Shortcuts, add a <em>Run AppleScript</em> action with one of those lines. macOS asks once for permission to control Standup.</p></details>
+<details><summary>The meeting ended early — can the desk go down sooner?</summary><p>Yes, with <em>Keep raised while on a call</em> on. When the meeting app's microphone and speaker go quiet before the scheduled end, a notification asks <em>Meeting over? Lower the desk?</em>. After half-time it asks right away; in the first half of the meeting it waits two quiet minutes, in case your connection just dropped. It asks once per meeting and only while the desk is up.</p></details>
+<details id="webhooks"><summary>Can Standup switch Home Assistant scenes? (coming soon)</summary><p><strong>Coming soon</strong> — not in the current App Store release yet. You will be able to enter a webhook URL in <em>Preferences → Webhook</em>. When the desk goes up for a meeting and when it goes down afterwards, Standup sends a <code>POST</code> with a small JSON body:</p>
+<pre><code>{
+  "app": "Standup",
+  "event": "meeting_started",
+  "source": "calendar",
+  "meeting": "Weekly sync",
+  "desk": "stand",
+  "height_cm": 110.2,
+  "timestamp": "2026-10-01T09:58:00Z"
+}</code></pre>
+<p><code>event</code> is <code>meeting_started</code> or <code>meeting_ended</code>, <code>source</code> is <code>calendar</code> or <code>unplanned_call</code>. Moving the desk yourself sends nothing. A <em>Send test</em> button checks the connection.</p>
+<p>In Home Assistant, create an automation with a webhook trigger and point Standup at <code>http://homeassistant.local:8123/api/webhook/standup</code>:</p>
+<pre><code>alias: Standup meetings
+triggers:
+  - trigger: webhook
+    webhook_id: standup
+    allowed_methods: [POST]
+    local_only: true
+actions:
+  - choose:
+      - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_meeting }
+      - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_focus }</code></pre></details>
 <details><summary>Can I move the desk with keyboard shortcuts?</summary><p>Yes, with the Shortcuts app. Make one shortcut for each action:</p><ol>
 <li>Open <em>Shortcuts</em> and create a new shortcut, for example "Desk: stand".</li>
 <li>Add a <em>Run AppleScript</em> action with <code>tell application "Standup" to move desk "stand"</code>. For the other shortcuts use <code>"sit"</code>, <code>"up"</code> or <code>"down"</code>.</li>
