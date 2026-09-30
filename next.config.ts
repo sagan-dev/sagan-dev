@@ -7,13 +7,15 @@ const ContentSecurityPolicy = `
     https://www.google-analytics.com
     https://cal.sagan.dev
     https://t.contentsquare.net
-    https://challenges.cloudflare.com;
+    https://challenges.cloudflare.com
+    https://static.cloudflareinsights.com;
   script-src-elem 'self' 'unsafe-inline' 'unsafe-eval'
     https://www.googletagmanager.com
     https://www.google-analytics.com
     https://cal.sagan.dev
     https://t.contentsquare.net
-    https://challenges.cloudflare.com;
+    https://challenges.cloudflare.com
+    https://static.cloudflareinsights.com;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://ui-avatars.com https://media.licdn.com;
   connect-src 'self'
@@ -23,7 +25,8 @@ const ContentSecurityPolicy = `
     https://cal.sagan.dev
     https://*.contentsquare.net
     https://challenges.cloudflare.com
-    https://api.sagan.eu;
+    https://api.sagan.eu
+    https://cloudflareinsights.com;
   frame-src https://challenges.cloudflare.com https://cal.sagan.dev;
   worker-src 'self' blob:;
   font-src 'self' data:;
