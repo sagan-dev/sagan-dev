@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support — Standup - Desk Remote Control</title>
-<meta name="description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript, keyboard shortcuts.">
+<meta name="description" content="Support and FAQ for Standup - Desk Remote Control: pairing, calendar access, meetings, AppleScript, keyboard shortcuts, webhooks.">
 <link rel="canonical" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
@@ -18,7 +18,7 @@
 <meta name="theme-color" content="#1f6bff">
 <link rel="icon" type="image/png" sizes="32x32" href="/apps/standup/assets/favicon-32.png">
 <link rel="apple-touch-icon" href="/apps/standup/assets/apple-touch-icon.png">
-<link rel="stylesheet" href="/apps/standup/style.css?v=3">
+<link rel="stylesheet" href="/apps/standup/style.css?v=4">
 </head>
 <body class="">
 <header class="site"><div class="wrap">
@@ -31,10 +31,17 @@
   </nav>
 </div></header>
 <main>
-<div class="wrap"><article class="doc"><h1>Support</h1><p class="meta">Answers to common questions. Still stuck? Write to <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>.</p><details><summary>Standup can't find my desk</summary><p>Try these in order:</p><ol>
+<div class="wrap"><article class="doc"><h1>Support</h1><p class="meta">Answers to common questions. Still stuck? Write to <a href="https://sagan.dev/#contact" data-contact="email" class="email-pending" aria-label="Contact e-mail">e-mail</a>.</p><details open><summary>How do I connect my desk the first time?</summary><ol>
+<li>Disconnect the desk from other devices — for example, close the desk app on your phone. The desk talks to one device at a time.</li>
+<li>Turn on pairing mode: hold the Bluetooth button on the desk's controller for about 3 seconds, until the blue light starts blinking.</li>
+<li>Open Standup and allow Bluetooth when macOS asks.</li>
+<li>Standup finds the desk and connects on its own — the popover shows "Connecting…" and then the desk's name. There is no separate pairing step on the Mac.</li></ol>
+<p>After that, Standup reconnects automatically whenever it starts and after your Mac wakes up.</p></details>
+<details><summary>Standup can't find my desk</summary><p>Try these in order:</p><ol>
 <li>Close any other app connected to the desk (a phone app, another Mac). The desk talks to one device at a time.</li>
 <li>Allow Bluetooth for Standup in <em>System Settings → Privacy &amp; Security → Bluetooth</em>.</li>
 <li>Make sure the desk's name in Bluetooth still contains the word "Desk".</li>
+<li>Turn on pairing mode: hold the Bluetooth button on the controller for about 3 seconds, until the light blinks.</li>
 <li>Reset the desk: lower it as far as it goes, hold the lower button until the desk jumps down and up, then hold the Bluetooth button on the controller until the light blinks, and open Standup again.</li></ol></details>
 <details><summary>How do I use Outlook meetings?</summary><p>Standup reads the macOS Calendar. Add your Outlook, Exchange or Microsoft 365 account in <em>System Settings → Internet Accounts</em> and make sure Calendars is switched on for it. The account then shows up in the Calendar app and Standup sees its meetings. Allow calendar access when Standup asks.</p></details>
 <details><summary>Which meetings raise the desk?</summary><p>Meetings that have other attendees, contain an online meeting link (Teams, Meet, Zoom, Webex, Whereby or GoToMeeting) in the URL, location or notes, and that you organise or have accepted. All-day events, cancelled, declined, tentative or unanswered invitations and events marked as "free" are ignored. The desk starts rising a couple of minutes before the start (you can change the lead time in Preferences).</p></details>
@@ -46,13 +53,105 @@
 <pre><code>tell application "Standup" to move desk "stand"    -- or "sit", "up", "down"
 tell application "Standup" to set desk height "120cm"  -- or "48in", or just "80"</code></pre>
 <p>In Shortcuts, add a <em>Run AppleScript</em> action with one of those lines. macOS asks once for permission to control Standup.</p></details>
+<details><summary>The meeting ended early — can the desk go down sooner?</summary><p>Yes, with <em>Keep raised while on a call</em> on. When the meeting app's microphone and speaker go quiet before the scheduled end, a notification asks <em>Meeting over? Lower the desk?</em>. After half-time it asks right away; in the first half of the meeting it waits two quiet minutes, in case your connection just dropped. It asks once per meeting and only while the desk is up.</p></details>
+<details id="webhooks"><summary>Can Standup switch Home Assistant scenes? (coming soon)</summary><p><strong>Coming soon</strong> — not in the current App Store release yet. You will be able to enter a webhook URL in <em>Preferences → Webhook</em>. When the desk goes up for a meeting and when it goes down afterwards, Standup sends a <code>POST</code> with a small JSON body:</p>
+<pre><code>{
+  "app": "Standup",
+  "event": "meeting_started",
+  "source": "calendar",
+  "meeting": "Weekly sync",
+  "desk": "stand",
+  "height_cm": 110.2,
+  "timestamp": "2026-10-01T09:58:00Z"
+}</code></pre>
+<p><code>event</code> is <code>meeting_started</code> or <code>meeting_ended</code>, <code>source</code> is <code>calendar</code> or <code>unplanned_call</code>. Moving the desk yourself sends nothing. A <em>Send test</em> button checks the connection.</p>
+<p>In Home Assistant, create an automation with a webhook trigger and point Standup at <code>http://homeassistant.local:8123/api/webhook/standup</code>:</p>
+<pre><code>alias: Standup meetings
+triggers:
+  - trigger: webhook
+    webhook_id: standup
+    allowed_methods: [POST]
+    local_only: true
+actions:
+  - choose:
+      - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_meeting }
+      - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_focus }</code></pre></details>
+<details id="webhook-test"><summary>How do I try my Home Assistant scene with "Send test"? (coming soon)</summary><p>By default <em>Send test</em> only checks the connection — it sends <code>"event": "test"</code>, which does not start a meeting. To use the button as an on/off switch for your meeting scene, let the webhook drive a helper (<code>input_boolean</code>) and attach the scene to that helper. The first test then switches the scene on, the second one switches it off and restores the lights. Put this in a package (for example <code>packages/standup.yaml</code>) and adjust the lights:</p>
+<pre><code>input_boolean:
+  standup_meeting:
+    name: "Standup meeting"
+
+automation:
+  - alias: "Standup - webhook"
+    mode: queued
+    triggers:
+      - trigger: webhook
+        webhook_id: standup-YOUR-RANDOM-ID
+        allowed_methods: [POST]
+        local_only: false
+    actions:
+      - choose:
+          - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+            sequence:
+              - action: input_boolean.turn_on
+                target: { entity_id: input_boolean.standup_meeting }
+          - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+            sequence:
+              - action: input_boolean.turn_off
+                target: { entity_id: input_boolean.standup_meeting }
+          # "Send test" switches the meeting scene on, the next test switches it off
+          - conditions: "{{ trigger.json.event == 'test' }}"
+            sequence:
+              - action: input_boolean.toggle
+                target: { entity_id: input_boolean.standup_meeting }
+
+  - alias: "Standup - meeting scene"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "off"
+        to: "on"
+    actions:
+      # Remember the lights first, so they can be restored afterwards
+      - action: scene.create
+        data:
+          scene_id: standup_before_meeting
+          snapshot_entities: [light.living_room, light.hallway, light.desk_lamp]
+      - action: light.turn_off
+        target: { entity_id: [light.living_room, light.hallway] }
+      - action: light.turn_on
+        target: { entity_id: light.desk_lamp }
+
+  - alias: "Standup - after the meeting"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "on"
+        to: "off"
+    conditions:
+      - condition: template
+        value_template: "{{ states.scene.standup_before_meeting is not none }}"
+    actions:
+      - action: scene.turn_on
+        target: { entity_id: scene.standup_before_meeting }</code></pre>
+<p>Tips:</p><ul>
+<li>Use a long random <code>webhook_id</code> if Home Assistant is reachable from the internet — the URL is the only thing protecting it.</li>
+<li>Don't check the saved scene for the state <code>unknown</code>: a scene made by <code>scene.create</code> stays <code>unknown</code> until it is used, so such a condition would stop the lights from ever coming back.</li>
+<li>Click <em>Send test</em> once, wait for the scene, then click again. Clicking many times quickly can make the scene remember lights that are already off.</li>
+<li>Reload automations and helpers (or restart Home Assistant) after editing the package.</li></ul></details>
 <details><summary>Can I move the desk with keyboard shortcuts?</summary><p>Yes, with the Shortcuts app. Make one shortcut for each action:</p><ol>
 <li>Open <em>Shortcuts</em> and create a new shortcut, for example "Desk: stand".</li>
 <li>Add a <em>Run AppleScript</em> action with <code>tell application "Standup" to move desk "stand"</code>. For the other shortcuts use <code>"sit"</code>, <code>"up"</code> or <code>"down"</code>.</li>
 <li>Open the shortcut's details (ⓘ), choose <em>Add Keyboard Shortcut</em> and press the keys, for example ⌃⌥↑ / ⌃⌥↓ for up and down and ⌃⌥S / ⌃⌥D for stand and sit.</li>
 <li>The first time you use it, allow Shortcuts to control Standup.</li></ol>
 <p>The shortcuts work in every app. <code>up</code> and <code>down</code> move the desk about 1 cm per press; holding the keys does not keep it moving.</p></details>
-<details><summary>How do I start Standup at login, or quit it?</summary><p>Open <em>Preferences</em> from the "…" menu in the popover and switch on <em>Open at login</em>. Choose <em>Quit</em> from the same menu to close the app.</p></details><h2>Contact</h2><p>Email: <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>. The free open-source edition (without meeting automation) takes bug reports on <a href="https://github.com/sagan-dev/Standup/issues">GitHub</a>.</p></article></div>
+<details><summary>How do I start Standup at login, or quit it?</summary><p>Open <em>Preferences</em> from the "…" menu in the popover and switch on <em>Open at login</em>. Choose <em>Quit</em> from the same menu to close the app.</p></details><h2>Contact</h2><p>Email: <a href="https://sagan.dev/#contact" data-contact="email" class="email-pending" aria-label="Contact e-mail">e-mail</a>. The free open-source edition (without meeting automation) takes bug reports on <a href="https://github.com/sagan-dev/Standup/issues">GitHub</a>.</p></article></div>
 </main>
 <footer class="site"><div class="wrap">
   <div>Made by <a href="https://sagan.dev">Michal Sagan</a> · <a href="https://sagan.dev">sagan.dev</a></div>
@@ -60,5 +159,6 @@ tell application "Standup" to set desk height "120cm"  -- or "48in", or just "80
   <div style="flex-basis:100%;font-size:13px">Standup is an independent app and is not affiliated with, endorsed by or sponsored by IKEA or Linak. Product names are used only to describe compatibility.</div>
 </div></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "47b94f0a5a2b44e58e5f27fb5e0a740e"}'></script><!-- End Cloudflare Web Analytics -->
+<script src="/apps/standup/contact.js" defer></script>
 </body>
 </html>

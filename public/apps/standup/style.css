@@ -65,3 +65,7 @@ details{background:var(--card);border:1px solid var(--line);border-radius:16px;p
 details summary{cursor:pointer;font-weight:600}
 details[open] summary{margin-bottom:8px}
 .note{background:var(--soft);border-radius:14px;padding:12px 16px;color:var(--ink);font-size:15px}
+/* Contact e-mail placeholder until contact.js fills it in */
+.email-pending{display:inline-block;min-width:9em;height:1em;vertical-align:-2px;color:transparent;background:var(--soft);border-radius:6px;animation:email-pulse 1.4s ease-in-out infinite}
+@keyframes email-pulse{50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.email-pending{animation:none}}

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wsparcie — Standup - Desk Remote Control</title>
-<meta name="description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript, skróty klawiszowe.">
+<meta name="description" content="Wsparcie i FAQ aplikacji Standup - Desk Remote Control: parowanie, dostęp do kalendarza, spotkania, AppleScript, skróty klawiszowe, webhooki.">
 <link rel="canonical" href="https://sagan.dev/apps/standup/pl/support">
 <link rel="alternate" hreflang="en" href="https://sagan.dev/apps/standup/support">
 <link rel="alternate" hreflang="pl" href="https://sagan.dev/apps/standup/pl/support">
@@ -18,7 +18,7 @@
 <meta name="theme-color" content="#1f6bff">
 <link rel="icon" type="image/png" sizes="32x32" href="/apps/standup/assets/favicon-32.png">
 <link rel="apple-touch-icon" href="/apps/standup/assets/apple-touch-icon.png">
-<link rel="stylesheet" href="/apps/standup/style.css?v=3">
+<link rel="stylesheet" href="/apps/standup/style.css?v=4">
 </head>
 <body class="">
 <header class="site"><div class="wrap">
@@ -31,10 +31,17 @@
   </nav>
 </div></header>
 <main>
-<div class="wrap"><article class="doc"><h1>Wsparcie</h1><p class="meta">Odpowiedzi na częste pytania. Nadal nie działa? Napisz na <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>.</p><details><summary>Standup nie widzi mojego biurka</summary><p>Spróbuj po kolei:</p><ol>
+<div class="wrap"><article class="doc"><h1>Wsparcie</h1><p class="meta">Odpowiedzi na częste pytania. Nadal nie działa? Napisz na <a href="https://sagan.dev/#contact" data-contact="email" class="email-pending" aria-label="Adres e-mail">e-mail</a>.</p><details open><summary>Jak połączyć biurko za pierwszym razem?</summary><ol>
+<li>Odłącz biurko od innych urządzeń — np. zamknij aplikację do biurka na telefonie. Biurko łączy się tylko z jednym urządzeniem naraz.</li>
+<li>Włącz tryb parowania: przytrzymaj przycisk Bluetooth na sterowniku biurka przez około 3 sekundy, aż niebieska lampka zacznie migać.</li>
+<li>Uruchom Standup i zezwól na Bluetooth, gdy macOS zapyta.</li>
+<li>Standup sam znajdzie biurko i się połączy — w popoverze pojawi się „Connecting…”, a potem nazwa biurka. Na Macu nie ma osobnego kroku parowania.</li></ol>
+<p>Później Standup łączy się automatycznie przy każdym uruchomieniu i po wybudzeniu Maca.</p></details>
+<details><summary>Standup nie widzi mojego biurka</summary><p>Spróbuj po kolei:</p><ol>
 <li>Zamknij każdą inną aplikację połączoną z biurkiem (aplikację na telefonie, inny Mac). Biurko rozmawia z jednym urządzeniem naraz.</li>
 <li>Zezwól Standupowi na Bluetooth w <em>Ustawieniach systemowych → Prywatność i ochrona → Bluetooth</em>.</li>
 <li>Upewnij się, że nazwa biurka w Bluetooth nadal zawiera słowo „Desk”.</li>
+<li>Włącz tryb parowania: przytrzymaj przycisk Bluetooth na sterowniku przez około 3 sekundy, aż dioda zacznie migać.</li>
 <li>Zresetuj biurko: opuść je do samego dołu, przytrzymaj przycisk w dół, aż biurko podskoczy w dół i w górę, potem przytrzymaj przycisk Bluetooth na sterowniku, aż dioda zacznie migać, i otwórz Standup ponownie.</li></ol></details>
 <details><summary>Jak używać spotkań z Outlooka?</summary><p>Standup czyta Kalendarz macOS. Dodaj konto Outlook, Exchange lub Microsoft 365 w <em>Ustawieniach systemowych → Konta internetowe</em> i upewnij się, że Kalendarze są dla niego włączone. Konto pojawi się wtedy w aplikacji Kalendarz, a Standup zobaczy jego spotkania. Zezwól na dostęp do kalendarza, gdy Standup o to poprosi.</p></details>
 <details><summary>Które spotkania podnoszą biurko?</summary><p>Takie, które mają innych uczestników, zawierają link do spotkania online (Teams, Meet, Zoom, Webex, Whereby lub GoToMeeting) w adresie URL, lokalizacji lub notatkach i które organizujesz albo zaakceptowałeś. Wydarzenia całodniowe, odwołane, odrzucone, wstępnie zaakceptowane lub bez odpowiedzi oraz oznaczone jako „wolny” są pomijane. Biurko zaczyna się podnosić kilka minut przed startem (czas możesz zmienić w Preferencjach).</p></details>
@@ -46,13 +53,105 @@
 <pre><code>tell application "Standup" to move desk "stand"    -- lub "sit", "up", "down"
 tell application "Standup" to set desk height "120cm"  -- lub "48in", albo samo "80"</code></pre>
 <p>W Skrótach dodaj akcję <em>Uruchom AppleScript</em> z jedną z tych linii. macOS raz zapyta o zgodę na sterowanie Standupem.</p></details>
+<details><summary>Spotkanie skończyło się wcześniej — czy biurko może zjechać szybciej?</summary><p>Tak, przy włączonym <em>Keep raised while on a call</em>. Gdy mikrofon i głośnik aplikacji do spotkań ucichną przed planowym końcem, powiadomienie zapyta <em>Meeting over? Lower the desk?</em>. Po połowie spotkania pyta od razu; w pierwszej połowie czeka dwie minuty ciszy, na wypadek gdyby tylko zerwało połączenie. Pyta raz na spotkanie i tylko wtedy, gdy biurko jest w górze.</p></details>
+<details id="webhooks"><summary>Czy Standup może przełączać sceny w Home Assistant? (wkrótce)</summary><p><strong>Wkrótce</strong> — tej funkcji nie ma jeszcze w obecnej wersji z App Store. W <em>Preferences → Webhook</em> wpiszesz adres webhooka. Gdy biurko podniesie się na spotkanie i gdy zjedzie po nim, Standup wyśle <code>POST</code> z krótkim JSON-em:</p>
+<pre><code>{
+  "app": "Standup",
+  "event": "meeting_started",
+  "source": "calendar",
+  "meeting": "Weekly sync",
+  "desk": "stand",
+  "height_cm": 110.2,
+  "timestamp": "2026-10-01T09:58:00Z"
+}</code></pre>
+<p><code>event</code> to <code>meeting_started</code> albo <code>meeting_ended</code>, <code>source</code> to <code>calendar</code> albo <code>unplanned_call</code>. Ręczne ruszanie biurkiem niczego nie wysyła. Przycisk <em>Send test</em> sprawdza połączenie.</p>
+<p>W Home Assistant utwórz automatyzację z wyzwalaczem webhook i wpisz w Standupie adres <code>http://homeassistant.local:8123/api/webhook/standup</code>:</p>
+<pre><code>alias: Standup meetings
+triggers:
+  - trigger: webhook
+    webhook_id: standup
+    allowed_methods: [POST]
+    local_only: true
+actions:
+  - choose:
+      - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_meeting }
+      - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+        sequence:
+          - action: scene.turn_on
+            target: { entity_id: scene.office_focus }</code></pre></details>
+<details id="webhook-test"><summary>Jak wypróbować scenę w Home Assistant przyciskiem „Send test”? (wkrótce)</summary><p>Domyślnie <em>Send test</em> sprawdza tylko połączenie — wysyła <code>"event": "test"</code>, które nie oznacza początku spotkania. Żeby przycisk włączał i wyłączał scenę spotkania, niech webhook steruje pomocnikiem (<code>input_boolean</code>), a scenę podepnij pod ten pomocnik. Pierwszy test włącza scenę, drugi ją wyłącza i przywraca światła. Wklej to do pakietu (np. <code>packages/standup.yaml</code>) i podmień światła na swoje:</p>
+<pre><code>input_boolean:
+  standup_meeting:
+    name: "Standup meeting"
+
+automation:
+  - alias: "Standup - webhook"
+    mode: queued
+    triggers:
+      - trigger: webhook
+        webhook_id: standup-YOUR-RANDOM-ID
+        allowed_methods: [POST]
+        local_only: false
+    actions:
+      - choose:
+          - conditions: "{{ trigger.json.event == 'meeting_started' }}"
+            sequence:
+              - action: input_boolean.turn_on
+                target: { entity_id: input_boolean.standup_meeting }
+          - conditions: "{{ trigger.json.event == 'meeting_ended' }}"
+            sequence:
+              - action: input_boolean.turn_off
+                target: { entity_id: input_boolean.standup_meeting }
+          # "Send test" switches the meeting scene on, the next test switches it off
+          - conditions: "{{ trigger.json.event == 'test' }}"
+            sequence:
+              - action: input_boolean.toggle
+                target: { entity_id: input_boolean.standup_meeting }
+
+  - alias: "Standup - meeting scene"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "off"
+        to: "on"
+    actions:
+      # Remember the lights first, so they can be restored afterwards
+      - action: scene.create
+        data:
+          scene_id: standup_before_meeting
+          snapshot_entities: [light.living_room, light.hallway, light.desk_lamp]
+      - action: light.turn_off
+        target: { entity_id: [light.living_room, light.hallway] }
+      - action: light.turn_on
+        target: { entity_id: light.desk_lamp }
+
+  - alias: "Standup - after the meeting"
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.standup_meeting
+        from: "on"
+        to: "off"
+    conditions:
+      - condition: template
+        value_template: "{{ states.scene.standup_before_meeting is not none }}"
+    actions:
+      - action: scene.turn_on
+        target: { entity_id: scene.standup_before_meeting }</code></pre>
+<p>Wskazówki:</p><ul>
+<li>Jeśli Home Assistant jest dostępny z internetu, użyj długiego, losowego <code>webhook_id</code> — tylko adres chroni webhook.</li>
+<li>Nie sprawdzaj, czy zapisana scena ma stan <code>unknown</code>: scena utworzona przez <code>scene.create</code> ma ten stan, dopóki nie zostanie użyta, więc taki warunek zablokowałby przywracanie świateł.</li>
+<li>Kliknij <em>Send test</em> raz, poczekaj na scenę i kliknij ponownie. Szybkie wielokrotne klikanie może sprawić, że scena zapamięta już zgaszone światła.</li>
+<li>Po edycji pakietu przeładuj automatyzacje i pomocniki (albo zrestartuj Home Assistant).</li></ul></details>
 <details><summary>Czy mogę sterować biurkiem skrótami klawiszowymi?</summary><p>Tak, przez aplikację Skróty. Utwórz osobny skrót dla każdej akcji:</p><ol>
 <li>Otwórz <em>Skróty</em> i utwórz nowy skrót, np. „Biurko: wstań”.</li>
 <li>Dodaj akcję <em>Uruchom AppleScript</em> z poleceniem <code>tell application "Standup" to move desk "stand"</code>. W pozostałych skrótach użyj <code>"sit"</code>, <code>"up"</code> albo <code>"down"</code>.</li>
 <li>Otwórz informacje o skrócie (ⓘ), wybierz <em>Dodaj skrót klawiszowy</em> i naciśnij klawisze, np. ⌃⌥↑ / ⌃⌥↓ dla góry i dołu oraz ⌃⌥S / ⌃⌥D dla wstań i siadaj.</li>
 <li>Przy pierwszym użyciu zezwól Skrótom na sterowanie Standupem.</li></ol>
 <p>Skróty działają w każdej aplikacji. <code>up</code> i <code>down</code> przesuwają biurko o ok. 1 cm na jedno naciśnięcie; przytrzymanie klawiszy nie utrzymuje ruchu.</p></details>
-<details><summary>Jak uruchamiać Standup przy logowaniu albo go zamknąć?</summary><p>Otwórz <em>Preferencje</em> z menu „…” w popoverze i włącz <em>Open at login</em>. Wybierz <em>Quit</em> z tego samego menu, żeby zamknąć aplikację.</p></details><h2>Kontakt</h2><p>E-mail: <a href="mailto:michal@sagan.dev">michal@sagan.dev</a>. Darmowa wersja open source (bez automatyzacji spotkań) przyjmuje zgłoszenia błędów na <a href="https://github.com/sagan-dev/Standup/issues">GitHubie</a>.</p></article></div>
+<details><summary>Jak uruchamiać Standup przy logowaniu albo go zamknąć?</summary><p>Otwórz <em>Preferencje</em> z menu „…” w popoverze i włącz <em>Open at login</em>. Wybierz <em>Quit</em> z tego samego menu, żeby zamknąć aplikację.</p></details><h2>Kontakt</h2><p>E-mail: <a href="https://sagan.dev/#contact" data-contact="email" class="email-pending" aria-label="Adres e-mail">e-mail</a>. Darmowa wersja open source (bez automatyzacji spotkań) przyjmuje zgłoszenia błędów na <a href="https://github.com/sagan-dev/Standup/issues">GitHubie</a>.</p></article></div>
 </main>
 <footer class="site"><div class="wrap">
   <div>Stworzone przez <a href="https://sagan.dev">Michała Sagana</a> · <a href="https://sagan.dev">sagan.dev</a></div>
@@ -60,5 +159,6 @@ tell application "Standup" to set desk height "120cm"  -- lub "48in", albo samo 
   <div style="flex-basis:100%;font-size:13px">Standup jest niezależną aplikacją i nie jest powiązany z firmami IKEA ani Linak, ani przez nie wspierany czy sponsorowany. Nazwy produktów służą wyłącznie do opisu zgodności.</div>
 </div></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "47b94f0a5a2b44e58e5f27fb5e0a740e"}'></script><!-- End Cloudflare Web Analytics -->
+<script src="/apps/standup/contact.js" defer></script>
 </body>
 </html>
