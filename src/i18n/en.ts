@@ -108,6 +108,21 @@ export const en = {
     impactTitle: "Impact",
     items: [
       {
+        title: "Standup — Desk Remote Control",
+        company: "Personal product",
+        period: "2026 - Present",
+        description:
+          "Native macOS menu bar app for Bluetooth sit/stand desks (IKEA IDÅSEN, Linak controller). Designed and built end to end: the desk protocol over Bluetooth LE, a movement engine that stops on the saved heights, calendar-driven automation and the Mac App Store release.",
+        technologies: ["Swift", "AppKit", "CoreBluetooth", "EventKit", "Bluetooth LE"],
+        impact: [
+          "Raises the desk before online meetings from Apple Calendar and Outlook",
+          "Notices when a call ends and offers to lower the desk",
+          "Free open-source edition on GitHub",
+        ],
+        url: "/apps/standup",
+        urlLabel: "Visit the Standup page",
+      },
+      {
         title: "Global Commerce GraphQL Federation",
         company: "Heineken",
         period: "2024 - Present",

@@ -5,9 +5,7 @@ import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const icons: LucideIcon[] = [GitBranch, Users, Zap, ExternalLink, GitBranch, Zap];
-
-type ProjectLink = { url?: string; urlLabel?: string };
+const icons: LucideIcon[] = [ArrowUpDown, GitBranch, Users, Zap, ExternalLink, GitBranch, Zap];
 
 export function Projects() {
   const { t } = useLanguage();
@@ -34,8 +32,7 @@ export function Projects() {
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.09 } } }}
           >
             {t.projects.items.map((project, index) => {
-              const link = project as typeof project & ProjectLink;
-              const Icon = link.url ? ArrowUpDown : icons[index] ?? ExternalLink;
+              const Icon = icons[index] ?? ExternalLink;
               return (
               <motion.div
                 key={index}
@@ -91,12 +88,12 @@ export function Projects() {
                   ))}
                 </div>
 
-                {link.url && (
+                {project.url && (
                   <a
-                    href={link.url}
+                    href={project.url}
                     className="inline-flex items-center gap-1 mt-4 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
                   >
-                    {link.urlLabel ?? link.url} →
+                    {project.urlLabel} →
                   </a>
                 )}
               </motion.div>

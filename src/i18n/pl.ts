@@ -110,6 +110,21 @@ export const pl: Translations = {
     impactTitle: "Wpływ",
     items: [
       {
+        title: "Standup — Desk Remote Control",
+        company: "Własny produkt",
+        period: "2026 - Obecnie",
+        description:
+          "Natywna aplikacja macOS w pasku menu do biurek z regulacją wysokości na Bluetooth (IKEA IDÅSEN, kontroler Linak). Zaprojektowana i zbudowana od początku do końca: protokół biurka przez Bluetooth LE, silnik ruchu zatrzymujący się na zapisanych wysokościach, automatyzacja oparta na kalendarzu i publikacja w Mac App Store.",
+        technologies: ["Swift", "AppKit", "CoreBluetooth", "EventKit", "Bluetooth LE"],
+        impact: [
+          "Podnosi biurko przed spotkaniami online z Kalendarza Apple i Outlooka",
+          "Wykrywa koniec rozmowy i proponuje opuszczenie biurka",
+          "Darmowa wersja open source na GitHubie",
+        ],
+        url: "/apps/standup/pl",
+        urlLabel: "Zobacz stronę Standup",
+      },
+      {
         title: "Globalna GraphQL Federation dla Commerce",
         company: "Heineken",
         period: "2024 - Obecnie",
