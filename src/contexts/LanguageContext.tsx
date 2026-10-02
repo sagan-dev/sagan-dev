@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { en, pl } from "@/i18n";
 import type { Translations } from "@/i18n";
-import type { SiteTranslations } from "@/content/default-site-content";
+import type { SiteTranslations } from "@/content/site-content";
 
 type Lang = "en" | "pl";
 

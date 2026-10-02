@@ -1,7 +1,7 @@
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { sendContactEmail } from "@/lib/resend";
-import { getSiteContent } from "@/lib/cms";
+import { siteContent } from "@/content/site-content";
 
 interface ContactInfo {
   email: string;
@@ -36,7 +36,6 @@ export const resolvers = {
         throw new Error("Too many requests. Please try again later.");
       }
 
-      const siteContent = await getSiteContent();
       const email = siteContent.contact.email || process.env.CONTACT_EMAIL || "";
       const phone = siteContent.contact.phone || process.env.CONTACT_PHONE || "";
 

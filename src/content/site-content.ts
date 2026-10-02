@@ -37,7 +37,7 @@ export interface SiteContent {
   schemaJson: Record<string, unknown>;
 }
 
-export const defaultSiteContent: SiteContent = {
+export const siteContent: SiteContent = {
   siteKey: "sagan-dev",
   slug: "home",
   translations: { en, pl },

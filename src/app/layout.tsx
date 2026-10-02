@@ -9,12 +9,12 @@ import { PageViewTracker } from "@/components/PageViewTracker";
 import { ApolloWrapper } from "@/app/ApolloWrapper";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { getSiteContent } from "@/lib/cms";
+import { siteContent } from "@/content/site-content";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { seo } = await getSiteContent();
+  const { seo } = siteContent;
 
   return {
     metadataBase: new URL(seo.metadataBase),
@@ -92,7 +92,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const siteContent = await getSiteContent();
 
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
