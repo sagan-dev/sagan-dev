@@ -1,11 +1,13 @@
 "use client";
 
-import { ExternalLink, GitBranch, Users, Zap } from "lucide-react";
+import { ArrowUpDown, ExternalLink, GitBranch, Users, Zap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const icons: LucideIcon[] = [GitBranch, Users, Zap, ExternalLink, GitBranch, Zap];
+
+type ProjectLink = { url?: string; urlLabel?: string };
 
 export function Projects() {
   const { t } = useLanguage();
@@ -32,7 +34,8 @@ export function Projects() {
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.09 } } }}
           >
             {t.projects.items.map((project, index) => {
-              const Icon = icons[index];
+              const link = project as typeof project & ProjectLink;
+              const Icon = link.url ? ArrowUpDown : icons[index] ?? ExternalLink;
               return (
               <motion.div
                 key={index}
@@ -87,6 +90,15 @@ export function Projects() {
                     </span>
                   ))}
                 </div>
+
+                {link.url && (
+                  <a
+                    href={link.url}
+                    className="inline-flex items-center gap-1 mt-4 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                  >
+                    {link.urlLabel ?? link.url} →
+                  </a>
+                )}
               </motion.div>
             );})}
           </motion.div>
