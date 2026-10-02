@@ -5,6 +5,7 @@ import {
   type SiteTranslations,
 } from "@/content/default-site-content";
 import type { Translations } from "@/i18n";
+import { withStandupProject } from "@/content/standup-project";
 
 interface DirectusSitePage {
   site_key?: string | null;
@@ -657,6 +658,10 @@ async function getLegacySiteContent(directusUrl: string): Promise<SiteContent> {
 }
 
 export async function getSiteContent(): Promise<SiteContent> {
+  return withStandupProject(await loadSiteContent());
+}
+
+async function loadSiteContent(): Promise<SiteContent> {
   const directusUrl = getDirectusBaseUrl();
   if (!directusUrl) return defaultSiteContent;
 
