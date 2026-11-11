@@ -88,13 +88,28 @@ export function Projects() {
                   ))}
                 </div>
 
-                {project.url && (
-                  <a
-                    href={project.url}
-                    className="inline-flex items-center gap-1 mt-4 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
-                  >
-                    {project.urlLabel} →
-                  </a>
+                {(project.url || project.storeUrl) && (
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4">
+                    {project.url && (
+                      <a
+                        href={project.url}
+                        className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                      >
+                        {project.urlLabel} →
+                      </a>
+                    )}
+                    {project.storeUrl && (
+                      <a
+                        href={project.storeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                      >
+                        {project.storeLabel}
+                        <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                      </a>
+                    )}
+                  </div>
                 )}
               </motion.div>
             );})}
