@@ -10,12 +10,15 @@ import { ApolloWrapper } from "@/app/ApolloWrapper";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { siteContent } from "@/content/site-content";
+import { openGraph } from "@/lib/seo";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export async function generateMetadata(): Promise<Metadata> {
   const { seo } = siteContent;
 
+  // No canonical, og:url or robots here: they are set per page (src/lib/seo.ts), so pages without them — the 404
+  // in particular — do not inherit the home page's canonical or "index, follow".
   return {
     metadataBase: new URL(seo.metadataBase),
     title: {
@@ -26,30 +29,12 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: seo.keywords,
     authors: [{ name: seo.authorName, url: seo.authorUrl }],
     creator: seo.creator,
-    openGraph: {
-      title: seo.titleDefault,
-      description: seo.description,
-      url: seo.canonical,
-      siteName: seo.siteName,
-      type: "website",
-      locale: seo.locale,
-      images: [
-        {
-          url: seo.image,
-          width: seo.imageWidth,
-          height: seo.imageHeight,
-          alt: seo.imageAlt,
-        },
-      ],
-    },
+    openGraph: openGraph(),
     twitter: {
       card: "summary_large_image",
       title: seo.titleDefault,
       description: seo.description,
       images: [seo.image],
-    },
-    alternates: {
-      canonical: seo.canonical,
     },
     manifest: "/manifest.webmanifest",
     icons: {
@@ -67,16 +52,6 @@ export async function generateMetadata(): Promise<Metadata> {
       capable: true,
       title: "sagan.dev",
       statusBarStyle: "black-translucent",
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
     },
   };
 }
