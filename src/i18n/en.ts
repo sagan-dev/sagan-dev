@@ -121,6 +121,8 @@ export const en = {
         ],
         url: "/apps/standup",
         urlLabel: "Visit the Standup page",
+        storeUrl: "https://apps.apple.com/us/app/standup-desk-remote-control/id6817507284?mt=12",
+        storeLabel: "Download on the Mac App Store",
       },
       {
         title: "Global Commerce GraphQL Federation",

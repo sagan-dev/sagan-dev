@@ -123,6 +123,8 @@ export const pl: Translations = {
         ],
         url: "/apps/standup/pl",
         urlLabel: "Zobacz stronę Standup",
+        storeUrl: "https://apps.apple.com/pl/app/standup-desk-remote-control/id6817507284?mt=12",
+        storeLabel: "Pobierz z Mac App Store",
       },
       {
         title: "Globalna GraphQL Federation dla Commerce",
