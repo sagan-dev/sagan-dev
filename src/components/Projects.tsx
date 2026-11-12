@@ -102,7 +102,8 @@ export function Projects() {
                       <a
                         href={project.storeUrl}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        // No "noreferrer": App Store Connect counts installs by web referrer (sagan.dev).
+                        rel="noopener"
                         className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
                       >
                         {project.storeLabel}

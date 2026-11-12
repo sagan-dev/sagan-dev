@@ -120,7 +120,7 @@ export const en = {
           "Free open-source edition on GitHub",
         ],
         url: "/apps/standup",
-        urlLabel: "Visit the Standup page",
+        urlLabel: "Standup: IKEA IDÅSEN desk app for Mac",
         storeUrl: "https://apps.apple.com/us/app/standup-desk-remote-control/id6817507284?mt=12",
         storeLabel: "Download on the Mac App Store",
       },
