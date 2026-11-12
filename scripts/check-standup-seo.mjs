@@ -96,7 +96,7 @@ for (const page of PAGES) {
     }
   }
   check(page, data.length === blocks.length && blocks.length > 0, `JSON-LD blocks parse (${blocks.length})`);
-  check(page, !/aggregateRating|"review"/i.test(blocks.join("\n")), "JSON-LD has no aggregateRating or review");
+  check(page, !/aggregateRating|"reviews?"/i.test(blocks.join("\n")), "JSON-LD has no aggregateRating or review");
 
   const app = data.find((x) => x["@type"] === "SoftwareApplication");
   check(page, !!app, "SoftwareApplication JSON-LD");
@@ -115,12 +115,12 @@ for (const page of PAGES) {
       q: text(m[1]),
       a: text(m[2]),
     }));
-    const marked = faq.mainEntity.map((x) => ({ q: x.name, a: x.acceptedAnswer?.text }));
+    const marked = (Array.isArray(faq.mainEntity) ? faq.mainEntity : []).map((x) => ({ q: x.name, a: x.acceptedAnswer?.text }));
     check(page, marked.length >= 6 && marked.length <= 8, `FAQ has 6–8 questions (${marked.length})`);
     check(page, JSON.stringify(marked) === JSON.stringify(visible), "FAQPage matches the visible questions and answers");
   }
 
-  // Only the IDÅSEN is claimed as confirmed; no unreleased features advertised as available.
+  // Unreleased features are not advertised as available.
   check(page, !/webhook/i.test(text(html)), "no webhooks (not released)");
 }
 
