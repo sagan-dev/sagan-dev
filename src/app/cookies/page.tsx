@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ResetConsentButton } from "@/components/ResetConsentButton";
+import { indexable, openGraph } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Cookie Policy",
   description:
     "Cookie Policy for sagan.dev — how we use cookies and how to manage your preferences.",
-  robots: { index: true, follow: true },
+  alternates: { canonical: "/cookies" },
+  openGraph: openGraph("/cookies", {
+    title: "Cookie Policy | Michał Sagan",
+    description: "Cookie Policy for sagan.dev — how we use cookies and how to manage your preferences.",
+  }),
+  robots: indexable,
 };
 
 export default function CookiesPage() {

@@ -8,6 +8,7 @@ import {
   getDevToolIconPath,
   type DevToolSlug,
 } from "@/lib/dev-tools";
+import { indexable, openGraph } from "@/lib/seo";
 
 interface DevToolPageProps {
   params: Promise<{
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: DevToolPageProps): Promise<Me
   }
 
   return {
-    title: `${tool.title} | Developer Toolbox | Michał Sagan`,
+    // The root layout's title.template appends " | Michał Sagan".
+    title: `${tool.title} | Developer Toolbox`,
     description: tool.description,
     manifest: `/dev-tool/${tool.slug}/manifest.webmanifest`,
     icons: {
@@ -49,18 +51,13 @@ export async function generateMetadata({ params }: DevToolPageProps): Promise<Me
       statusBarStyle: "black-translucent",
     },
     alternates: {
-      canonical: `https://sagan.dev/dev-tool/${tool.slug}`,
+      canonical: `/dev-tool/${tool.slug}`,
     },
-    openGraph: {
+    openGraph: openGraph(`/dev-tool/${tool.slug}`, {
       title: `${tool.title} | Developer Toolbox`,
       description: tool.description,
-      url: `https://sagan.dev/dev-tool/${tool.slug}`,
-      type: "website",
-    },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    }),
+    robots: indexable,
   };
 }
 
