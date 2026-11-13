@@ -122,7 +122,7 @@ export const pl: Translations = {
           "Darmowa wersja open source na GitHubie",
         ],
         url: "/apps/standup/pl",
-        urlLabel: "Zobacz stronę Standup",
+        urlLabel: "Standup: aplikacja do biurka IKEA IDÅSEN na Maca",
         storeUrl: "https://apps.apple.com/pl/app/standup-desk-remote-control/id6817507284?mt=12",
         storeLabel: "Pobierz z Mac App Store",
       },
