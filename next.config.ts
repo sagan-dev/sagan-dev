@@ -56,17 +56,19 @@ const nextConfig: NextConfig = {
     ],
   },
   // Standup app pages: static HTML in public/apps/standup, served on clean URLs.
-  // English lives at the root, every other language under its own lowercase prefix
-  // (keep STANDUP_LANGS in sync with the language list used when generating public/apps/standup/*).
+  // The home page is EN ("") and PL ("/pl") only; support and privacy are translated into the
+  // full STANDUP_LANGS set (keep it in sync with src/app/sitemap.ts and the generated page set).
   async rewrites() {
     const STANDUP_LANGS = [
       "pl", "ar", "ca", "cs", "da", "de", "el", "es", "es-mx", "fi", "fr", "fr-ca", "he", "hi", "hr",
       "hu", "id", "it", "ja", "ko", "ms", "nb", "nl", "pt-br", "pt-pt", "ro", "ru", "sk", "sv", "th",
       "tr", "uk", "vi", "zh-hans", "zh-hant",
     ];
-    const subpages = ["", "/privacy", "/support"];
     const prefixes = ["", ...STANDUP_LANGS.map((l) => `/${l}`)];
-    const pages = prefixes.flatMap((prefix) => subpages.map((sub) => `${prefix}${sub}`));
+    const pages = [
+      "", "/pl",
+      ...prefixes.flatMap((prefix) => ["/privacy", "/support"].map((sub) => `${prefix}${sub}`)),
+    ];
     return pages.map((page) => ({
       source: `/apps/standup${page}`,
       destination: `/apps/standup${page}/index.html`,

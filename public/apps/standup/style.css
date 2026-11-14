@@ -1,11 +1,11 @@
 :root{
   --bg:#f5f7fb; --card:#ffffff; --ink:#0f172a; --muted:#5b6478; --line:rgba(15,23,42,.09);
   --accent:#1f6bff; --accent-2:#5aa2ff; --soft:rgba(31,107,255,.08); --shadow:0 10px 30px rgba(20,40,90,.08);
-  --radius:20px; --maxw:1040px;
+  --radius:20px; --maxw:1040px; --tag-ink:#1450c8;
 }
 @media (prefers-color-scheme:dark){
   :root{--bg:#0b0f17; --card:#131a26; --ink:#eef2fb; --muted:#9aa5bb; --line:rgba(255,255,255,.09);
-        --accent:#5b9cff; --accent-2:#8bbcff; --soft:rgba(91,156,255,.12); --shadow:0 10px 30px rgba(0,0,0,.45)}
+        --accent:#5b9cff; --accent-2:#8bbcff; --tag-ink:#8bbcff; --soft:rgba(91,156,255,.12); --shadow:0 10px 30px rgba(0,0,0,.45)}
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -50,7 +50,7 @@ section .lead{color:var(--muted);max-width:680px;margin:0 0 24px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
 .card h3{margin:0 0 6px;font-size:17px;letter-spacing:-.01em}
 .card p{margin:0;color:var(--muted);font-size:15px}
-.tag{display:inline-block;font-size:12px;font-weight:600;color:var(--accent);background:var(--soft);border-radius:999px;padding:2px 9px;margin-bottom:10px}
+.tag{display:inline-block;font-size:12px;font-weight:600;color:var(--tag-ink);background:var(--soft);border-radius:999px;padding:2px 9px;margin-bottom:10px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:760px){.two{grid-template-columns:1fr}nav.main .hide-sm{display:none}}
 ul.clean{margin:8px 0 0;padding-left:20px;color:var(--muted)}
@@ -77,3 +77,12 @@ details[open] summary{margin-bottom:8px}
 .email-pending{display:inline-block;min-width:9em;height:1em;vertical-align:-2px;color:transparent;background:var(--soft);border-radius:6px;animation:email-pulse 1.4s ease-in-out infinite}
 @keyframes email-pulse{50%{opacity:.5}}
 @media (prefers-reduced-motion:reduce){.email-pending{animation:none}}
+/* Landing: brand line above the H1, quick facts under the CTA, FAQ and closing CTA */
+.hero .kicker{margin:0 0 10px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+.hero .facts{margin:14px 0 0;font-size:14px;color:var(--muted)}
+.card p a,.more a,.faq a{text-decoration:underline;text-underline-offset:2px}
+.faq{max-width:760px}
+.faq details p{margin:0;color:var(--muted)}
+.more{color:var(--muted);margin:16px 0 0}
+section.cta{text-align:center}
+section.cta .lead{margin:0 auto 20px}
